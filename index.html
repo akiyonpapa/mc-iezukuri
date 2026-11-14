@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="マイクラJava版の家づくりを3Dで試して、必要なブロックの数を数えるツール">
 <title>マイクラ家づくり材料ナビ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,7 @@ header.top p{margin:0;color:var(--muted);max-width:66ch}
 @media (max-width:520px){.seg button{padding:7px 10px;font-size:14px}}
 .selpanel{display:flex;flex-direction:column;gap:6px;background:var(--surface2);border:1px solid var(--line);border-left:4px solid #2b7de9;border-radius:8px;padding:10px}
 .sp-t{margin:0;font-weight:700}
-.selpanel[hidden],.hint[hidden]{display:none}
+.selpanel[hidden],.hint[hidden],.rowl[hidden],.row[hidden]{display:none}
 .layer #cutR{width:min(220px,42vw);accent-color:var(--accent)}
 .cutl{font-size:13px;font-variant-numeric:tabular-nums;min-width:8.5em}
 @media (max-width:520px){.layer{gap:6px}.layer .lbl{display:none}.layer #cutR{width:24vw}.cutl{min-width:0;font-size:12px}.layer .iconbtn{min-width:36px;min-height:36px}.layer .seg button{padding:5px 9px;min-height:36px;font-size:13px}}
@@ -149,6 +149,54 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .mat .ct small{display:block;color:var(--muted);font-size:12px}
 .mat.done .nm div,.mat.done .ct b{text-decoration:line-through;opacity:.55}
 .empty{padding:14px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:13.5px}
+/* ===== ゲーム画面モード：3D画面を画面いっぱいに。ブロック一覧と設定は右上のメニュー、材料は左の引き出しで開く ===== */
+.gonly{display:none!important}
+html.game .gonly{display:grid!important}
+html.game .nogame{display:none!important}
+html.game{--hbw:min(540px,calc(100vw - 20px));--hbh:calc(var(--hbw) / 9 + 10px)}
+html.game,html.game body{overflow:hidden;height:100%;overscroll-behavior:none}
+html.game body{padding:0}
+html.game header.top,html.game .side{display:none}
+html.game .stage{position:static}
+html.game #cbox{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:20;border:0;border-radius:0}
+html.game #hotbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));width:var(--hbw);z-index:55;background:rgba(14,20,16,.6);padding:4px;border-radius:10px}
+html.game #hotbar .slot{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.28)}
+html.game #hotbar .slot[aria-pressed="true"]{border-color:#fff;background:rgba(255,255,255,.3)}
+html.game #statusRow{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--hbh) + 14px + env(safe-area-inset-bottom,0px));width:var(--hbw);z-index:30;justify-content:center;pointer-events:none}
+html.game #status{background:rgba(14,20,16,.72);color:#f2f5f0;padding:3px 10px;border-radius:8px;font-size:12.5px;text-align:center;min-height:0}
+html.game #status:empty{display:none}
+html.game #status.warn{color:#ffb39a}
+html.game .hint{bottom:calc(var(--hbh) + 52px)}
+html.game #selPanel{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--hbh) + 44px + env(safe-area-inset-bottom,0px));width:var(--hbw);max-height:42vh;overflow:auto;z-index:35;background:var(--surface)}
+html.game #photoPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 20px));max-height:calc(100dvh - 20px);overflow:auto;z-index:70;background:var(--surface);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.gmenu{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column}
+.gmenu[hidden],.gdrawer[hidden],.modeask[hidden],.gm-body[hidden]{display:none}
+.gm-head{display:flex;align-items:center;gap:8px;padding:10px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);background:var(--surface)}
+.gm-head h2{font-family:var(--f-disp);font-weight:400;font-size:20px;margin:0 auto 0 0;white-space:nowrap}
+.gm-head .ptabs{flex:0 1 auto;min-width:0}
+.gm-close{white-space:nowrap}
+@media (max-width:460px){.gm-head h2{font-size:17px}.gm-head .ptabs button{padding:4px 9px;font-size:13px}.gm-close{padding:4px 10px}}
+.gm-body{flex:1;overflow-y:auto;padding:12px max(12px,env(safe-area-inset-right,0px)) calc(var(--hbh,70px) + 24px) max(12px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px;max-width:1100px;width:100%;margin:0 auto}
+.gm-body .pal{max-height:none;overflow:visible}
+.gm-body .panel{border:0;padding:0;background:transparent}
+.gm-close{font:inherit;font-size:15px;font-weight:700;min-height:40px;padding:4px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);cursor:pointer}
+.gm-sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px}
+.gm-sec h3{font-size:15px;margin:0;font-weight:700}
+.gdrawer{position:fixed;left:0;top:0;bottom:0;width:min(380px,88vw);z-index:45;background:var(--surface);border-right:1px solid var(--line);box-shadow:4px 0 24px rgba(0,0,0,.3);display:flex;flex-direction:column}
+.gdrawer .gm-body{padding-bottom:calc(var(--hbh,70px) + 24px)}
+.gdrawer .panel{border:0;padding:0;background:transparent}
+.gdrawer .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.modeask{position:fixed;inset:0;z-index:90;background:rgba(10,14,11,.72);display:grid;place-items:center;padding:16px}
+.ma-card{background:var(--surface);color:var(--ink);border-radius:14px;padding:18px;width:min(560px,100%);display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.ma-card h2{font-family:var(--f-disp);font-weight:400;font-size:22px;margin:0;line-height:1.3}
+.ma-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:460px){.ma-opts{grid-template-columns:minmax(0,1fr)}}
+.ma-opt{font:inherit;text-align:left;border:2px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:12px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.ma-opt b{font-size:16px}
+.ma-opt span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.ma-opt.last{border-color:var(--accent)}
+.ma-opt:hover{border-color:var(--accent)}
+.uiswitch{align-self:flex-start}
 </style>
 </head>
 <body>
@@ -158,12 +206,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
   <header class="top">
     <h1>マイクラ家づくり材料ナビ<span class="badge">テスト版</span></h1>
     <p>地面にブロックを置いて家を建てると、使った材料を自動で数えます。Java版26.3のブロック<span id="bcount"></span>から選べます。</p>
+    <button class="btn uiswitch" id="toGame">ゲーム画面で遊ぶ（画面いっぱい）</button>
   </header>
 
   <div class="layout">
     <section class="stage" aria-label="建築画面">
       <div class="panel">
-        <div class="row layer">
+        <div class="row layer" id="layerRow">
           <div class="rowl">
             <label class="lbl" for="cutR">見える高さ</label>
             <button class="iconbtn" id="cutDn" aria-label="見える高さを1段下げる">▼</button>
@@ -181,6 +230,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
         </div>
         <div class="canvasbox" id="cbox"><canvas id="cv" aria-label="建築画面。タップでブロックを置いたり壊したりします"></canvas><div class="hint" id="hint">地面をなぞると、選んだブロックを並べて置けます</div>
           <div class="tools left" role="group" aria-label="操作の切り替え">
+            <button class="tool gonly" id="gMat" aria-label="使っている材料を見る" title="使っている材料を見る（M）"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M8.5 10h7M8.5 14h7M8.5 18h4"/></svg></button>
             <button class="tool" id="mPlace" aria-pressed="true" aria-label="置く" title="置く"><svg viewBox="0 0 24 24"><path d="M11 4 4 7.8v8.4L11 20l7-3.8V12"/><path d="M11 20v-8.2L4 7.8M11 11.8l3.5-1.9"/><path d="M19 2v6M16 5h6"/></svg></button>
             <button class="tool" id="mBreak" aria-pressed="false" aria-label="壊す" title="壊す"><svg viewBox="0 0 24 24"><path d="M4 20l9-9"/><path d="M8.5 5.5C12 3 17 3.2 20.5 7c-1.3-.6-3.3-.8-5 0l-3.5 3.5L9.5 8C10 6.8 9.5 6 8.5 5.5z"/></svg></button>
             <button class="tool" id="mRep" aria-pressed="false" aria-label="置き換え" title="置き換え"><svg viewBox="0 0 24 24"><path d="M4.5 10A7.5 7.5 0 0 1 18 7l1.5 1.5"/><path d="M19.5 3.5v5h-5"/><path d="M19.5 14A7.5 7.5 0 0 1 6 17l-1.5-1.5"/><path d="M4.5 20.5v-5h5"/></svg></button>
@@ -190,6 +240,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
             <button class="tool" id="undo" disabled aria-label="戻す" title="戻す"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
           </div>
           <div class="tools right" role="group" aria-label="視点">
+            <button class="tool gonly" id="gMenu" aria-label="メニュー（ブロック選び・設定）" title="メニュー（ブロック選び・設定）（E）"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg></button>
             <button class="tool" id="zIn" aria-label="近づく" title="近づく"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5M10.5 7.5v6M7.5 10.5h6"/></svg></button>
             <button class="tool" id="zOut" aria-label="離れる" title="離れる"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5M7.5 10.5h6"/></svg></button>
             <button class="tool" id="tTop" aria-label="上から見る" title="上から見る"><svg viewBox="0 0 24 24"><path d="M12 2v7M9 6l3 3 3-3"/><rect x="5" y="12" width="14" height="9" rx="1"/></svg></button>
@@ -215,9 +266,9 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
           <p class="note" id="photoNote">Xは投稿画面で、保存した画像を添付してください。インスタグラムはスマホに保存した画像をアプリから投稿します。</p>
         </div>
         <div class="hotbar" id="hotbar" role="group" aria-label="ホットバー"></div>
-        <div class="row">
+        <div class="row" id="statusRow">
           <p class="status" id="status" aria-live="polite"></p>
-          <button class="btn" id="toPal">ブロックを選ぶ</button>
+          <button class="btn nogame" id="toPal">ブロックを選ぶ</button>
         </div>
         <div class="rowl" id="tdOpt" hidden>
           <span class="lbl">トラップドアを壁の横に付けるとき</span>
@@ -228,7 +279,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
           <div class="fgrid" id="fgrid"></div>
           <p class="note">端から2マス以内にブロックを置くと、その方向へ自動で4マスずつ広がります。ボタンでも1回押すと4マスずつ広げられます（最大128×128マス）。建てたブロックより内側には狭められません。</p>
         </details>
-        <dl class="help">
+        <dl class="help" id="helpBox">
           <dt>スマホ</dt><dd>1本指でなぞると置き続ける（『壊す』のときは壊し続ける）。2本指でそろえて下になぞると真上から、上になぞると斜めの立体に。2本指でずらすと移動、ひねると回転、つまむと拡大・縮小</dd>
           <dt>マウス</dt><dd>左ドラッグで置き続ける・壊し続ける。右ドラッグで回転と傾き、ホイールで拡大・縮小</dd>
           <dt>キー</dt><dd>スペースを押しながら左ドラッグで移動。Shift＋左ドラッグでいつでも壊す。Alt＋左クリックでそのブロックを手に取る。Ctrl＋Zで戻す</dd>
@@ -253,7 +304,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
         <p class="note">選んだブロックは、ホットバーの選択中の枠に入ります。</p>
       </section>
 
-      <section class="panel" aria-label="必要な材料">
+      <section class="panel" id="matPanel" aria-label="必要な材料">
         <div class="row">
           <h2>必要な材料</h2>
           <div class="rowl" id="clearBox"></div>
@@ -264,7 +315,36 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
       </section>
     </div>
   </div>
-  <footer class="disc">
+  <div class="gmenu" id="gMenuBox" hidden role="dialog" aria-modal="true" aria-label="メニュー">
+    <div class="gm-head">
+      <h2>メニュー</h2>
+      <div class="ptabs" role="tablist" aria-label="メニューの切り替え"><button id="gtBlocks" role="tab" aria-selected="true">ブロック</button><button id="gtSet" role="tab" aria-selected="false">設定・使い方</button></div>
+      <button class="gm-close" id="gMenuClose" aria-label="メニューを閉じる">閉じる ✕</button>
+    </div>
+    <div class="gm-body" id="gmBlocks"></div>
+    <div class="gm-body" id="gmSet" hidden>
+      <div class="gm-sec" id="gmLayer"><h3>上の段を隠す・透かす</h3></div>
+      <div class="gm-sec" id="gmOpts"><h3>置き方・フィールド</h3></div>
+      <div class="gm-sec" id="gmHelp"><h3>操作のしかた</h3></div>
+      <div class="gm-sec"><h3>画面の切り替え</h3><button class="btn" id="toNormal">今の画面（スクロールする画面）に戻す</button><p class="note">次にツールを開いたときに、どちらの画面にするか選べます。</p></div>
+      <div class="gm-sec" id="gmDisc"></div>
+    </div>
+  </div>
+  <aside class="gdrawer" id="gDrawer" hidden aria-label="使っている材料">
+    <div class="gm-head"><h2>使っている材料</h2><button class="gm-close" id="gDrawerClose" aria-label="材料を閉じる">✕</button></div>
+    <div class="gm-body" id="gmMats"></div>
+  </aside>
+  <div class="modeask" id="modeAsk" hidden role="dialog" aria-modal="true" aria-labelledby="maT">
+    <div class="ma-card">
+      <h2 id="maT">どちらの画面で遊びますか？</h2>
+      <div class="ma-opts">
+        <button class="ma-opt" data-ui="game"><b>ゲーム画面</b><span>3Dの画面がいっぱいに広がります。右上のメニューでブロックを選び、左のボタンで材料を見ます。</span></button>
+        <button class="ma-opt" data-ui="page"><b>今までの画面</b><span>建築画面・ブロック一覧・材料が1ページに並びます。スクロールして使います。</span></button>
+      </div>
+      <p class="note">あとからいつでも切り替えられます。前回使った画面に枠が付いています。</p>
+    </div>
+  </div>
+  <footer class="disc" id="discBox">
     <p>作ったものは、このブラウザの中だけに保存されます。サーバーには送られません。別の端末やブラウザには引き継がれません。</p>
     <p>このツールはMinecraft公式のものではありません。Mojang・Microsoftの承認を受けたものではなく、関係もありません。</p>
     <p lang="en">NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</p>
@@ -353,7 +433,10 @@ const P={
  chestFront(g){F(g,'#a8743a');border(g,'#5e3d18');Q(g,0,5,16,1,'#5e3d18');Q(g,1,1,14,1,'#c58d4f');Q(g,7,3,2,5,'#d8d8dc');Q(g,7,7,2,1,'#8a8a90');},
  chestSide(g){F(g,'#a8743a');border(g,'#5e3d18');Q(g,0,5,16,1,'#5e3d18');Q(g,1,1,14,1,'#c58d4f');},
  chestTop(g){F(g,'#a8743a');border(g,'#5e3d18');Q(g,1,1,14,1,'#c58d4f');Q(g,1,8,14,1,'#8f6230');},
- lecTop(g){F(g,'#a07446');border(g,'#5e4325');Q(g,3,3,10,9,'#f1ead8');Q(g,8,3,1,9,'#c9bfa6');for(const y of[5,7,9]){Q(g,4,y,3,1,'#9a9080');Q(g,9,y,3,1,'#9a9080');}},
+ lecTop(g){P.planks(g,'#a07446');border(g,'#5e4325');Q(g,1,1,14,1,'#b98a56');},
+ lecBook(g){F(g,'#6b3a22');Q(g,1,1,14,14,'#f1ead8');Q(g,7,1,2,14,'#c9bfa6');for(const y of[4,6,8,10,12]){Q(g,2,y,4,1,'#9a9080');Q(g,10,y,4,1,'#9a9080');}},
+ chestHalf(g,latchLeft){P.chestFront(g);const sx=latchLeft?0:15;Q(g,sx,1,1,4,'#a8743a');Q(g,sx,6,1,9,'#a8743a');Q(g,sx,5,1,1,'#5e3d18');Q(g,7,3,2,5,'#a8743a');Q(g,7,5,2,1,'#5e3d18');Q(g,latchLeft?0:15,3,1,5,'#d8d8dc');Q(g,latchLeft?0:15,7,1,1,'#8a8a90');},
+ chestTopP(g){F(g,'#a8743a');Q(g,0,0,16,1,'#5e3d18');Q(g,0,15,16,1,'#5e3d18');Q(g,0,8,16,1,'#8f6230');},
  lecSide(g){P.planks(g,'#a07446');border(g,'#5e4325');},
  cauldron(g){F(g,'#3d3f45');border(g,'#26272b');Q(g,1,1,14,1,'#5a5d64');Q(g,3,6,1,1,'#6a6d74');Q(g,12,6,1,1,'#6a6d74');},
  brewRod(g){F(g,'#c9a227');Q(g,0,0,16,2,'#e8c85a');},
@@ -592,10 +675,10 @@ const oakPl=tileIdx['oak_pl'],cobT=tileIdx['cobblestone'];
 add('crafting_table','作業台','Crafting Table','furn','wood','cube',{up:T('craft_t',P.craftTop),down:oakPl,north:T('craft_f',P.craftFront),south:tileIdx['craft_f'],east:T('craft_s',P.craftSide),west:tileIdx['craft_s']});
 add('furnace','かまど','Furnace','furn','stone','cube',{up:T('furn_t',P.furnTop),down:tileIdx['furn_t'],side:T('furn_s',P.furnSide),front:T('furn_f',P.furnFront)},{facing:'h'});
 add('smoker','燻製器','Smoker','furn','stone','cube',{up:T('smok_t',P.smokTop),down:tileIdx['smok_t'],side:T('smok_s',P.smokSide),front:T('smok_f',P.smokFront)},{facing:'h'});
-add('chest','チェスト','Chest','furn','wood','chest',{front:T('chest_f',P.chestFront),side:T('chest_s',P.chestSide),top:T('chest_t',P.chestTop)});
+add('chest','チェスト','Chest','furn','wood','chest',{front:T('chest_f',P.chestFront),side:T('chest_s',P.chestSide),top:T('chest_t',P.chestTop),frontL:T('chest_fl',g=>P.chestHalf(g,true)),frontR:T('chest_fr',g=>P.chestHalf(g,false)),topP:T('chest_tp',P.chestTopP)});
 add('barrel','樽','Barrel','furn','wood','cube',{front:T('barrel_t',P.barrelTop),back:T('barrel_b',P.barrelBot),side:T('barrel_s',P.barrelSide)},{facing:'6'});
 add('bookshelf','本棚','Bookshelf','furn','wood','cube',{up:oakPl,down:oakPl,side:T('books',P.books)});
-add('lectern','書見台','Lectern','furn','wood','lectern',{top:T('lec_t',P.lecTop),side:T('lec_s',P.lecSide)});
+add('lectern','書見台','Lectern','furn','wood','lectern',{top:T('lec_t',P.lecTop),side:T('lec_s',P.lecSide),book:T('lec_b',P.lecBook)});
 add('cauldron','大釜','Cauldron','furn','craft','cauldron',T('cauldron',P.cauldron));
 add('brewing_stand','醸造台','Brewing Stand','furn','craft','brewing',{rod:T('brew_r',P.brewRod),base:T('brew_b',P.brewBase)});
 add('piston','ピストン','Piston','furn','craft','cube',{front:T('piston_t',P.pistonTop),back:T('piston_b',P.pistonBot),side:T('piston_s',P.pistonSide)},{facing:'6'});
@@ -603,8 +686,161 @@ add('lever','レバー','Lever','furn','craft','lever',{base:cobT,handle:T('hand
 add('flower_pot','植木鉢','Flower Pot','furn','craft','fpot',{side:T('pot_s',P.potSide),top:T('pot_t',P.potTop)});
 add('decorated_pot','飾り壺','Decorated Pot','furn','craft','dpot',{side:T('dpot_s',P.dpot),top:T('dpot_t',P.dpotTop)},{stack:1});
 add('cake','ケーキ','Cake','furn','craft','cake',{side:T('cake_s',P.cakeSide),top:T('cake_t',P.cakeTop),bottom:T('cake_b',P.cakeBot)},{stack:1});
-add('painting','絵画','Painting','furn','craft','painting',{front:T('painting',P.painting),edge:T('frame_e',P.frameEdge)},{flat:tileIdx['painting']});
-add('item_frame','額縁','Item Frame','furn','craft','frame',T('itemframe',P.itemFrame),{flat:tileIdx['itemframe']});
+add('item_frame','額縁','Item Frame','furn','craft','frame',T('itemframe',P.itemFrame),{flat:tileIdx['itemframe'],sub:'絵画・額縁'});
+// ===== 絵画（大きさ違い・絵柄はこのツール用に描いたオリジナル）=====
+// 大きな絵を1枚のキャンバスに描いてから、16px ずつのタイルに切り分ける
+const ART=(()=>{
+ const px=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+ const sky=(g,W,H,top,bot,h)=>{for(let y=0;y<h;y++){const t=y/Math.max(1,h-1);g.fillStyle=mix(top,bot,t);g.fillRect(0,y,W,1);}};
+ const mix=(a,b,t)=>{const p=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16)),A=p(a),Bc=p(b);return'#'+A.map((v,i)=>Math.round(v+(Bc[i]-v)*t).toString(16).padStart(2,'0')).join('');};
+ const disc=(g,cx,cy,r,c)=>{g.fillStyle=c;for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++)if(x*x+y*y<=r*r+r*.6)g.fillRect(cx+x,cy+y,1,1);};
+ const mount=(g,x0,base,w,h,c,snow)=>{for(let i=0;i<w;i++){const d=Math.abs(i-w/2)/(w/2),hh=Math.round(h*(1-d));px(g,x0+i,base-hh,1,hh,c);if(snow&&hh>h*.72)px(g,x0+i,base-hh,1,Math.max(1,Math.round(hh-h*.72)),'#f4f6f8');}};
+ const tree=(g,x,base,h,c1,c2)=>{px(g,x,base-h,2,h,'#5a3d22');disc(g,x+1,base-h,Math.max(2,Math.round(h*.55)),c1);disc(g,x,base-h-1,Math.max(1,Math.round(h*.3)),c2);};
+ const house=(g,x,base,w,h,wall,roof)=>{px(g,x,base-h,w,h,wall);for(let i=0;i<=Math.ceil(w/2);i++)px(g,x+i,base-h-Math.ceil(w/2)+i,w-2*i,1,roof);px(g,x+Math.floor(w/2)-1,base-3,2,3,'#5a3d22');if(w>5)px(g,x+1,base-h+2,2,2,'#f6e9a8');};
+ const waves=(g,W,y0,y1,c1,c2)=>{for(let y=y0;y<y1;y++)for(let x=0;x<W;x++)if((x+y*3)%7===0)px(g,x,y,2,1,c2);};
+ const frame=(g,W,H)=>{g.strokeStyle='#5e3d18';g.lineWidth=1;px(g,0,0,W,1,'#5e3d18');px(g,0,H-1,W,1,'#5e3d18');px(g,0,0,1,H,'#5e3d18');px(g,W-1,0,1,H,'#5e3d18');};
+ // 絵柄：[名前, 描く関数(g,W,H)]
+ const A={
+  hills:(g,W,H)=>{sky(g,W,H,'#7fb8e0','#c8e6f4',H);disc(g,W*.78|0,H*.22|0,Math.max(1,W*.07|0),'#f6d24a');px(g,0,H*.6|0,W,H,'#6fae4f');for(let x=0;x<W;x++){const y=(H*.6+Math.sin(x/W*6.3)*H*.08)|0;px(g,x,y,1,H,'#5c9a40');}px(g,0,H*.8|0,W,H,'#4f8a3a');px(g,W*.15|0,H*.25|0,W*.25|0,Math.max(1,H*.05|0),'#ffffff');},
+  vase:(g,W,H)=>{px(g,0,0,W,H,'#e9dcc0');px(g,0,H*.72|0,W,H,'#b48a54');const cx=W/2|0;px(g,cx-3,H*.5|0,6,H*.26|0,'#3a6fb0');px(g,cx-2,H*.48|0,4,2,'#2f5a90');for(const[dx,dy,c]of[[-3,-5,'#d8433a'],[2,-6,'#f2c13a'],[0,-8,'#e86aa0'],[-1,-3,'#ffffff'],[3,-3,'#d8433a']]){px(g,cx+dx-1,(H*.48|0)+dy-1,3,3,c);px(g,cx+dx,(H*.48|0)+dy+2,1,Math.max(1,-dy-1),'#3f7a32');}},
+  sunset:(g,W,H)=>{sky(g,W,H,'#3a2f6b','#f29a4a',H*.62|0);disc(g,W/2|0,H*.62|0,Math.max(2,W*.12|0),'#ffd36a');px(g,0,H*.62|0,W,H,'#2d4f7a');waves(g,W,H*.66|0,H,'#2d4f7a','#5a86b0');px(g,(W/2|0)-1,H*.64|0,3,H*.3|0,'#f2b25a');},
+  moon:(g,W,H)=>{sky(g,W,H,'#0f1a3a','#2b3f6e',H);for(let i=0;i<W*H/14;i++)px(g,R()*W|0,R()*H*.7|0,1,1,'#e8ecff');disc(g,W*.7|0,H*.28|0,Math.max(2,W*.11|0),'#f4f0d0');disc(g,(W*.7|0)+2,(H*.28|0)-1,Math.max(1,W*.08|0),'#1a2850');px(g,0,H*.8|0,W,H,'#1f3a2a');},
+  boat:(g,W,H)=>{sky(g,W,H,'#8fc8ee','#d8eefa',H*.55|0);px(g,0,H*.55|0,W,H,'#3f7fb8');waves(g,W,H*.58|0,H,'#3f7fb8','#7ab0dc');const bx=W*.35|0,by=H*.62|0;px(g,bx,by,10,2,'#7a4a24');px(g,bx+1,by+2,8,1,'#5e3d18');px(g,bx+4,by-8,1,8,'#5e3d18');for(let i=0;i<6;i++)px(g,bx+5,by-8+i,i<3?i+1:6-i,1,'#f4f4f4');disc(g,W*.85|0,H*.2|0,2,'#fff1a0');},
+  lake:(g,W,H)=>{sky(g,W,H,'#9fd0f0','#e0f2fb',H*.5|0);mount(g,0,H*.55|0,W*.45|0,H*.38|0,'#6a7f9a',1);mount(g,W*.3|0,H*.55|0,W*.5|0,H*.46|0,'#5a6f8a',1);mount(g,W*.65|0,H*.55|0,W*.4|0,H*.32|0,'#7a8faa',1);px(g,0,H*.55|0,W,H,'#4a8fc0');waves(g,W,H*.58|0,H*.8|0,'#4a8fc0','#8ec4e6');px(g,0,H*.82|0,W,H,'#5c9a40');},
+  wheat:(g,W,H)=>{sky(g,W,H,'#9fd0f0','#f4ead0',H*.5|0);px(g,0,H*.5|0,W,H,'#d8b04a');for(let y=H*.5|0;y<H;y+=2)for(let x=(y%4);x<W;x+=4)px(g,x,y,1,1,'#b08a2a');house(g,W*.7|0,H*.52|0,7,4,'#e8dcc4','#a8432f');tree(g,W*.15|0,H*.52|0,4,'#4f8a3a','#6fae4f');},
+  tree:(g,W,H)=>{sky(g,W,H,'#a8d8f4','#e8f6fc',H);px(g,0,H*.85|0,W,H,'#6fae4f');px(g,(W/2|0)-1,H*.4|0,3,H*.46|0,'#6b4628');disc(g,W/2|0,H*.34|0,Math.max(3,W*.42|0),'#4f8a3a');disc(g,(W/2|0)-2,H*.3|0,Math.max(2,W*.25|0),'#6fae4f');for(const[dx,dy]of[[-3,1],[3,-2],[1,3]])px(g,(W/2|0)+dx,(H*.34|0)+dy,1,1,'#d8433a');},
+  lighthouse:(g,W,H)=>{sky(g,W,H,'#6fa8d8','#cfe8f6',H*.7|0);px(g,0,H*.72|0,W,H,'#3f7fb8');waves(g,W,H*.74|0,H,'#3f7fb8','#7ab0dc');px(g,0,H*.68|0,W*.6|0,H*.06|0,'#8a8a8a');const cx=W*.3|0;for(let y=H*.22|0;y<H*.68;y++)px(g,cx-2,y,5,1,((y/3|0)%2)?'#d8433a':'#f4f4f4');px(g,cx-3,(H*.22|0)-3,7,3,'#3a3a3a');px(g,cx-1,(H*.22|0)-2,3,1,'#fff27a');for(let i=1;i<W*.6;i++)px(g,cx+2+i,(H*.22|0)-2+(i/4|0),1,1,'rgba(255,240,150,.55)');},
+  falls:(g,W,H)=>{px(g,0,0,W,H,'#5c9a40');px(g,0,0,W,H*.15|0,'#9fd0f0');px(g,W*.3|0,H*.12|0,W*.4|0,H*.75|0,'#8a8a8a');px(g,W*.38|0,H*.12|0,W*.24|0,H*.72|0,'#9fd8f4');for(let y=H*.12|0;y<H*.84;y+=2)px(g,(W*.38|0)+((y*7)%(Math.max(1,W*.24|0))),y,1,2,'#ffffff');px(g,0,H*.84|0,W,H,'#4a8fc0');waves(g,W,H*.86|0,H,'#4a8fc0','#d8f0fb');tree(g,2,H*.6|0,4,'#3f7a32','#4f8a3a');tree(g,W-4,H*.7|0,4,'#3f7a32','#4f8a3a');},
+  castle:(g,W,H)=>{sky(g,W,H,'#7fb8e0','#d8eefa',H);px(g,0,H*.78|0,W,H,'#5c9a40');const x0=W*.2|0,w=W*.6|0,base=H*.8|0;px(g,x0,base-H*.32|0,w,H*.32|0,'#a8a8b0');for(let x=x0;x<x0+w;x+=3)px(g,x,(base-H*.32|0)-2,2,2,'#a8a8b0');for(const tx of[x0-2,x0+w-3]){px(g,tx,base-H*.48|0,5,H*.48|0,'#9898a0');for(let i=0;i<4;i++)px(g,tx-1+i*2-(i>1?0:0),(base-H*.48|0)-2,1,2,'#9898a0');px(g,tx+1,(base-H*.48|0)-6,3,4,'#3a5fa8');}px(g,x0+(w/2|0)-2,base-6,4,6,'#5a3d22');px(g,x0+4,base-H*.22|0,2,3,'#3a3a40');px(g,x0+w-6,base-H*.22|0,2,3,'#3a3a40');},
+  sunflowers:(g,W,H)=>{sky(g,W,H,'#8fc8ee','#e8f6fc',H*.45|0);px(g,0,H*.45|0,W,H,'#4f8a3a');for(let y=H*.5|0,r=0;y<H;y+=6,r++)for(let x=(r%2)*4+2;x<W;x+=8){px(g,x,y,1,5,'#3f7a32');disc(g,x,y,2,'#f2c13a');px(g,x,y,1,1,'#6b4628');}},
+  blocks:(g,W,H)=>{const C=['#d8433a','#f2c13a','#3a6fb0','#4f8a3a','#f4f4f4','#2b2b2b'];px(g,0,0,W,H,'#f4ead0');for(let i=0;i<14;i++){const w=3+(R()*W*.3|0),h=3+(R()*H*.3|0);px(g,R()*(W-w)|0,R()*(H-h)|0,w,h,C[i%C.length]);}px(g,0,H/2|0,W,1,'#2b2b2b');px(g,W*.62|0,0,1,H,'#2b2b2b');},
+  range:(g,W,H)=>{sky(g,W,H,'#f2a65a','#fbe3b0',H*.6|0);disc(g,W*.5|0,H*.42|0,Math.max(2,H*.12|0),'#fff1c0');for(let i=0;i<6;i++)mount(g,(i*W/5|0)-W*.08|0,H*.7|0,W*.3|0,H*(.28+R()*.18)|0,i%2?'#7a5a8a':'#6a4a7a',0);px(g,0,H*.7|0,W,H,'#3f6a4a');for(let x=2;x<W;x+=5)tree(g,x,H*.95|0,3,'#2f5a3a','#3f6a4a');},
+  village:(g,W,H)=>{sky(g,W,H,'#8fc8ee','#e0f2fb',H*.55|0);px(g,0,H*.6|0,W,H,'#6fae4f');px(g,0,H*.85|0,W,2,'#c9a26a');const cols=[['#e8dcc4','#a8432f'],['#c9a26a','#3a5fa8'],['#f4f4f4','#6b4628'],['#e8dcc4','#4f8a3a']];for(let i=0;i<5;i++){const c=cols[i%4];house(g,3+i*(W/5|0),H*.82|0,7+(i%2)*2,5+(i%3),c[0],c[1]);}for(let x=1;x<W;x+=11)tree(g,x,H*.62|0,4,'#4f8a3a','#6fae4f');},
+  forest:(g,W,H)=>{sky(g,W,H,'#a8d8f4','#e8f6fc',H*.4|0);mount(g,W*.1|0,H*.45|0,W*.5|0,H*.25|0,'#7a9a8a',0);mount(g,W*.45|0,H*.45|0,W*.55|0,H*.3|0,'#6a8a7a',0);px(g,0,H*.45|0,W,H,'#3f7a32');px(g,W*.2|0,H*.62|0,W*.6|0,H*.2|0,'#4a8fc0');waves(g,W,H*.64|0,H*.8|0,'#4a8fc0','#8ec4e6');for(let x=1;x<W;x+=4)tree(g,x,(x>W*.2&&x<W*.8)?H*.6|0:H*.9|0,4+(x%3),'#2f6a2a','#3f7a32');},
+  harbor:(g,W,H)=>{sky(g,W,H,'#1f2a55','#5a4a7a',H*.55|0);for(let i=0;i<W;i++)if(R()<.3)px(g,i,R()*H*.4|0,1,1,'#e8ecff');px(g,0,H*.55|0,W,H,'#1f3a5a');for(let i=0;i<6;i++){const x=i*(W/6|0)+2,h=H*(.12+R()*.18)|0;px(g,x,(H*.55|0)-h,W/8|0,h,'#2a2a3a');for(let y=(H*.55|0)-h+2;y<H*.55-1;y+=3)for(let xx=x+1;xx<x+(W/8|0)-1;xx+=3)if(R()<.6)px(g,xx,y,1,1,'#f6d26a');}for(let y=H*.58|0;y<H;y+=2)for(let x=0;x<W;x+=5)if(R()<.4)px(g,x,y,2,1,'#f6d26a');},
+  bigsun:(g,W,H)=>{sky(g,W,H,'#f26a3a','#fbd06a',H*.6|0);disc(g,W/2|0,H*.55|0,W*.22|0,'#fff1b0');disc(g,W/2|0,H*.55|0,W*.17|0,'#ffe27a');px(g,0,H*.62|0,W,H,'#2d4f7a');waves(g,W,H*.64|0,H,'#2d4f7a','#f2a65a');px(g,W*.1|0,H*.3|0,8,1,'#7a3a2a');px(g,W*.14|0,H*.27|0,1,3,'#7a3a2a');px(g,W*.75|0,H*.2|0,6,1,'#7a3a2a');},
+  bigtree:(g,W,H)=>{sky(g,W,H,'#8fc8ee','#e8f6fc',H);px(g,0,H*.88|0,W,H,'#5c9a40');px(g,(W/2|0)-3,H*.45|0,6,H*.44|0,'#6b4628');px(g,(W/2|0)-1,H*.5|0,1,H*.3|0,'#4a321c');disc(g,W/2|0,H*.36|0,W*.36|0,'#3f7a32');disc(g,(W*.36|0),H*.3|0,W*.18|0,'#4f8a3a');disc(g,(W*.64|0),H*.28|0,W*.2|0,'#5c9a40');disc(g,W/2|0,H*.18|0,W*.16|0,'#6fae4f');for(let i=0;i<10;i++)px(g,(W*.2+R()*W*.6)|0,(H*.1+R()*H*.4)|0,1,1,'#f4f4f4');},
+ };
+ return{A,frame};
+})();
+// 大きさごとに使える絵柄（どれもこのツールのオリジナル）
+const PAINT_SIZES=[[1,1,['hills','vase','sunset','moon']],[2,1,['boat','lake','wheat']],[1,2,['tree','lighthouse','falls']],[2,2,['castle','sunflowers','blocks']],[4,2,['range','village']],[4,3,['forest','harbor']],[4,4,['bigsun','bigtree']]];
+function paintArt(name,pw,ph){
+ const W=pw*16,H=ph*16,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');seedOf('art_'+name+pw+'x'+ph);ART.A[name](g,W,H);ART.frame(g,W,H);
+ const rows=[];for(let r=0;r<ph;r++){const row=[];for(let q=0;q<pw;q++)row.push(T(`art_${name}_${pw}x${ph}_${q}_${r}`,gg=>gg.drawImage(cv,-q*16,-r*16)));rows.push(row);}
+ const sc=16/Math.max(W,H),ic=T(`art_${name}_${pw}x${ph}_icon`,gg=>{gg.imageSmoothingEnabled=false;gg.clearRect(0,0,16,16);const w=W*sc,h=H*sc;gg.drawImage(cv,(16-w)/2,(16-h)/2,w,h);});
+ return{rows,icon:ic};
+}
+{const edge=T('frame_e',P.frameEdge);
+ for(const[pw,ph,names]of PAINT_SIZES){const arts=names.map(n=>paintArt(n,pw,ph)),id=pw===1&&ph===1?'painting':`painting_${pw}x${ph}`;
+  add(id,pw===1&&ph===1?'絵画':`絵画（横${pw}×縦${ph}）`,pw===1&&ph===1?'Painting':`Painting ${pw}x${ph}`,'furn','craft','painting',{arts:arts.map(a=>a.rows),edge},{flat:arts[0].icon,pw,ph,matOf:'painting',sub:'絵画・額縁'});}}
+
+// ===== 額縁に飾れる武器・道具（絵はこのツール用に描いたオリジナル）=====
+const TIERS=[['wooden','木','Wooden',['#c9a26a','#a0743f','#6b4a2b']],['stone','石','Stone',['#b0b0b0','#8a8a8a','#5a5a5a']],['copper','銅','Copper',['#f0a878','#c8743f','#8a4a2a']],['iron','鉄','Iron',['#ffffff','#d8d8d8','#9a9a9a']],['golden','金','Golden',['#fff27a','#f2cf3a','#b08a1a']],['diamond','ダイヤモンド','Diamond',['#c8fff8','#4fe0d8','#1f9a9a']],['netherite','ネザライト','Netherite',['#7a6e72','#4a4246','#2a2428']]];
+// 武器・道具の絵：持ち手は左下、刃は右上に向けて斜めに描く（太めの線で、小さくても形がわかるように）
+const TOOLDRAW=(()=>{
+ const H='#8a5f34',Hk='#5a3d22';
+ const P=(g,x,y,c)=>{if(x<0||y<0||x>15||y>15)return;g.fillStyle=c;g.fillRect(x,y,1,1);};
+ const stick=(g,x0,y0,n)=>{for(let t=0;t<n;t++){P(g,x0+t,y0-t,H);P(g,x0+t+1,y0-t,Hk);P(g,x0+t,y0-t+1,Hk);}};
+ return{
+  sword(g,[l,m,d]){for(let t=0;t<10;t++){const x=5+t,y=10-t;P(g,x,y,m);P(g,x+1,y,l);P(g,x,y+1,d);P(g,x+1,y-1,l);}P(g,15,0,l);
+   for(const[x,y]of[[2,8],[3,9],[4,10],[5,11],[6,12],[7,13]]){P(g,x,y,d);P(g,x+1,y-1,m);}stick(g,2,13,2);P(g,1,14,d);P(g,0,15,d);P(g,1,15,d);},
+  axe(g,[l,m,d]){stick(g,2,14,10);const head=[[1,6,9],[2,5,10],[3,4,10],[4,4,10],[5,4,9],[6,5,8],[7,6,7]];
+   for(const[y,a,b]of head)for(let x=a;x<=b;x++)P(g,x,y,x===a||y===1?l:(x===b||y===7)?d:m);for(let t=0;t<4;t++)P(g,10+t,4-t,Hk);},
+  pickaxe(g,[l,m,d]){stick(g,2,14,10);const arc=[[1,6],[2,4],[3,3],[4,2],[5,2],[6,1],[7,1],[8,1],[9,1],[10,2],[11,2],[12,3],[13,4],[13,5],[14,6],[14,7],[15,8]];
+   arc.forEach(([x,y],i)=>{P(g,x-1,y+1,i<9?l:d);P(g,x,y+1,m);P(g,x,y,i<9?l:m);});P(g,0,5,d);P(g,1,4,m);P(g,15,9,d);},
+  shovel(g,[l,m,d]){stick(g,2,14,8);const bl=[[2,10,12],[3,9,13],[4,9,13],[5,9,13],[6,10,12]];for(const[y,a,b]of bl)for(let x=a;x<=b;x++)P(g,x+0,y-1,x===a||y===2?l:(x===b||y===6)?d:m);P(g,11,0,l);P(g,10,6,d);P(g,9,7,d);},
+  spear(g,[l,m,d]){for(let t=0;t<11;t++){P(g,1+t,15-t,H);P(g,2+t,15-t,Hk);}const tip=[[11,4],[12,3],[13,2],[14,1],[15,0]];tip.forEach(([x,y])=>{P(g,x,y,m);P(g,x+1,y,l);P(g,x,y+1,d);});P(g,11,2,l);P(g,10,3,l);P(g,13,5,d);P(g,12,6,d);P(g,10,5,d);P(g,11,5,d);},
+ };})();
+const WKINDS=[['sword','剣','Sword','剣'],['axe','斧','Axe','斧'],['spear','槍','Spear','槍'],['pickaxe','ツルハシ','Pickaxe','ツルハシ'],['shovel','シャベル','Shovel','シャベル']];
+const addTool=(id,ja,en,sub,tile,o)=>add(id,ja,en,'tool','craft','item',tile,Object.assign({flat:tile,sub,stack:1,frameable:1,note:'額縁をタップすると飾れます'},o||{}));
+for(const[k,kj,ke,sub]of WKINDS)for(const[t,tj,te,c]of TIERS){const id=`${t}_${k}`;addTool(id,`${tj}の${kj}`,`${te} ${ke}`,sub,T('it_'+id,g=>{CLR(g);TOOLDRAW[k](g,c);}));}
+{const S='#d8d8d8',W='#8a5f34',Wd='#5a3d22';
+ addTool('bow','弓','Bow','そのほかの武器',T('it_bow',g=>{CLR(g);const p=[[3,1],[5,1],[7,2],[9,3],[10,5],[11,7],[12,9],[13,11],[14,13]];p.forEach(([x,y],i)=>{g.fillStyle=i%2?Wd:W;g.fillRect(x-1,y,2,2);});g.fillStyle=W;g.fillRect(1,2,2,2);g.fillStyle='#e8e8e8';for(let i=0;i<12;i++)g.fillRect(2+i,3+i,1,1);}));
+ addTool('crossbow','クロスボウ','Crossbow','そのほかの武器',T('it_crossbow',g=>{CLR(g);g.fillStyle=Wd;for(let i=0;i<11;i++)g.fillRect(3+i,12-i,2,2);g.fillStyle='#6a6a70';for(let i=0;i<9;i++){g.fillRect(2+i,2+i*.3|0,1,1);g.fillRect(12-i*.3|0,13-i,1,1);}g.fillStyle='#b0b0b8';g.fillRect(6,6,3,3);g.fillStyle='#e8e8e8';for(let i=0;i<8;i++)g.fillRect(3+i,3+i,1,1);}));
+ addTool('trident','トライデント','Trident','そのほかの武器',T('it_trident',g=>{CLR(g);g.fillStyle='#2f8a8a';for(let i=0;i<11;i++)g.fillRect(1+i,14-i,1,1);g.fillStyle='#4fc0c0';for(let i=0;i<10;i++)g.fillRect(2+i,14-i,1,1);g.fillStyle='#8af0e8';g.fillRect(10,2,1,4);g.fillRect(13,5,3,1);g.fillRect(12,1,2,2);g.fillRect(14,3,2,2);g.fillRect(11,4,2,2);}));
+ addTool('mace','メイス','Mace','そのほかの武器',T('it_mace',g=>{CLR(g);g.fillStyle=W;for(let i=0;i<9;i++)g.fillRect(2+i,13-i,2,1);g.fillStyle='#6a6a70';g.fillRect(9,2,6,6);g.fillStyle='#9a9aa0';g.fillRect(10,3,4,4);g.fillStyle='#c8c8d0';g.fillRect(8,1,2,2);g.fillRect(14,1,2,2);g.fillRect(14,7,2,2);g.fillRect(11,1,2,1);}));
+ addTool('shield','盾','Shield','そのほかの武器',T('it_shield',g=>{CLR(g);g.fillStyle='#6a6a70';g.fillRect(3,1,10,14);g.fillStyle='#a07446';g.fillRect(4,2,8,12);g.fillStyle='#8a5f34';for(const x of[6,9])g.fillRect(x,2,1,12);g.fillStyle='#9a9aa0';g.fillRect(7,6,2,4);}));
+ addTool('fishing_rod','釣り竿','Fishing Rod','飾りになる道具',T('it_rod',g=>{CLR(g);g.fillStyle=W;for(let i=0;i<13;i++)g.fillRect(1+i,14-i,1,1);g.fillStyle=Wd;g.fillRect(1,13,2,2);g.fillStyle='#e8e8e8';for(let y=2;y<12;y++)g.fillRect(14,y,1,1);g.fillStyle='#8a8a90';g.fillRect(13,12,2,2);}));
+ addTool('clock','時計','Clock','飾りになる道具',T('it_clock',g=>{CLR(g);for(let y=0;y<16;y++)for(let x=0;x<16;x++){const d=(x-7.5)**2+(y-7.5)**2;if(d<44){g.fillStyle=d>30?'#b08a1a':'#f2cf3a';g.fillRect(x,y,1,1);}}g.fillStyle='#4a8fc0';g.fillRect(4,8,8,3);g.fillStyle='#f6f2c8';g.fillRect(5,4,6,4);g.fillStyle='#2b2b2b';g.fillRect(7,4,1,4);g.fillRect(7,7,3,1);}),{stack:64});
+ addTool('compass','コンパス','Compass','飾りになる道具',T('it_compass',g=>{CLR(g);for(let y=0;y<16;y++)for(let x=0;x<16;x++){const d=(x-7.5)**2+(y-7.5)**2;if(d<44){g.fillStyle=d>30?'#5a5a5a':'#a8a8b0';g.fillRect(x,y,1,1);}}g.fillStyle='#e8e8ea';g.fillRect(4,4,8,8);g.fillStyle='#d8433a';for(let i=0;i<4;i++)g.fillRect(8+i*.5|0,7-i,1,1);g.fillStyle='#4a4a50';for(let i=0;i<4;i++)g.fillRect(7-i*.5|0,8+i,1,1);}),{stack:64});
+}
+// ===== 額縁に飾れるアイテム（防具・食べ物・素材など。絵はこのツール用に描いたオリジナル）=====
+{
+ const P=(g,x,y,c)=>{g.fillStyle=c;g.fillRect(x,y,1,1);},Rc=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+ const ball=(g,cx,cy,r,c,hi,sh)=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){const d=(x+.5-cx)**2+(y+.5-cy)**2;if(d<=r*r){let k=c;if(sh&&(x+.5-cx)+(y+.5-cy)>r*.55)k=sh;if(hi&&(x+.5-cx)+(y+.5-cy)<-r*.75)k=hi;P(g,x,y,k);}}};
+ const tmpl=(g,rows,pal,ox,oy)=>rows.forEach((r,y)=>[...r].forEach((ch,x)=>{const c=pal[ch];if(c)P(g,x+ox,y+oy,c);}));
+ const AR={
+  helmet:['.dmmmmmmmmd.','dmllllllllmd','mlmmmmmmmmlm','mm........mm','md........dm','dd........dd'],
+  chest:['.dmmd....dmmd.','dmlmmd..dmmlmd','mlmmmmmmmmmmlm','mmmdmmmmmmdmmm','dd..mmmmmm..dd','....mlmmmm....','....mmmmmm....','....mmmmmm....','....dmmmmd....','....dddddd....'],
+  legs:['dmmmmmmmmd','mlmmmmmmlm','mmmmmmmmmm','mmm....mmm','mlm....mlm','mmm....mmm','mmm....mmm','ddd....ddd'],
+  boots:['mm......mm.','mm......mm.','mlm.....mlm','mmmm....mmmm','dddd....dddd'],
+ };
+ const AOFF={helmet:[2,5],chest:[1,3],legs:[3,4],boots:[2,6]};
+ const ATIER=[['leather','革','Leather',['#c98a5a','#8a5a32','#5e3d1e'],['帽子','上着','ズボン','ブーツ']],['chainmail','チェーン','Chainmail',['#d0d0d4','#9a9aa0','#5a5a60'],null],['copper','銅','Copper',['#f0a878','#c8743f','#8a4a2a'],null],['iron','鉄','Iron',['#ffffff','#d8d8d8','#9a9a9a'],null],['golden','金','Golden',['#fff27a','#f2cf3a','#b08a1a'],null],['diamond','ダイヤモンド','Diamond',['#c8fff8','#4fe0d8','#1f9a9a'],null],['netherite','ネザライト','Netherite',['#7a6e72','#4a4246','#2a2428'],null]];
+ const APART=[['helmet','ヘルメット','Helmet'],['chest','チェストプレート','Chestplate'],['legs','レギンス','Leggings'],['boots','ブーツ','Boots']];
+ const IT=(id,ja,en,sub,fn,o)=>add(id,ja,en,'tool','craft','item',T('it_'+id,g=>{CLR(g);fn(g);}),Object.assign({flat:tileIdx['it_'+id],sub,frameable:1,note:'額縁をタップすると飾れます'},o||{}));
+ for(const[t,tj,te,c,lj]of ATIER)APART.forEach(([k,pj,pe],i)=>{const id=`${t}_${k==='chest'?'chestplate':k==='legs'?'leggings':k}`;
+  IT(id,`${tj}の${lj?lj[i]:pj}`,`${te} ${t==='leather'?['Cap','Tunic','Pants','Boots'][i]:pe}`,'防具',g=>{const pal={l:c[0],m:c[1],d:c[2]};tmpl(g,AR[k],pal,AOFF[k][0],AOFF[k][1]);if(t==='chainmail')for(let y=0;y<16;y+=2)for(let x=(y/2)%2;x<16;x+=2){const d=g.getImageData(x,y,1,1).data;if(d[3])P(g,x,y,'#3a3a40');}},{stack:1});});
+ IT('turtle_helmet','カメの甲羅','Turtle Shell','防具',g=>{tmpl(g,AR.helmet,{l:'#8ad86a',m:'#4fa83a',d:'#2f6a2a'},2,5);P(g,5,6,'#2f6a2a');P(g,8,6,'#2f6a2a');P(g,10,6,'#2f6a2a');},{stack:1});
+ // 食べ物
+ const F='食べ物';
+ IT('apple','リンゴ','Apple',F,g=>{ball(g,8,9.5,5.5,'#d8332a','#ff8a7a','#9a1f1a');Rc(g,8,2,1,3,'#5a3d22');Rc(g,9,2,3,2,'#4f8a3a');});
+ IT('golden_apple','金のリンゴ','Golden Apple',F,g=>{ball(g,8,9.5,5.5,'#f2cf3a','#fff6b0','#b08a1a');Rc(g,8,2,1,3,'#5a3d22');Rc(g,9,2,3,2,'#4f8a3a');});
+ IT('bread','パン','Bread',F,g=>{for(let x=1;x<15;x++){const h=x<3||x>12?3:5;Rc(g,x,8-(h>>1),1,h,'#c98a3a');}for(const x of[4,7,10])Rc(g,x,6,1,3,'#8a5a22');Rc(g,2,9,12,1,'#8a5a22');});
+ IT('cookie','クッキー','Cookie',F,g=>{ball(g,8,8,6,'#c98a4a',null,'#a06a32');for(const[x,y]of[[5,5],[9,6],[6,9],[10,10],[8,12],[4,8]])Rc(g,x,y,2,1,'#4a2a14');});
+ IT('melon_slice','スイカの薄切り','Melon Slice',F,g=>{for(let y=0;y<9;y++)for(let x=0;x<16;x++){const d=Math.hypot(x+.5-8,y+.5-3);if(d<7.5&&y>=3){P(g,x,y+3,d>6.5?'#3f8a2a':d>5.6?'#c8e8a0':'#e8453a');}}for(const[x,y]of[[6,8],[9,9],[8,7],[11,8],[4,7]])P(g,x,y,'#2b1a10');});
+ IT('carrot','ニンジン','Carrot',F,g=>{for(let t=0;t<9;t++)Rc(g,3+t,12-t,2+(t>5?1:0),2,t%3?'#f08a2a':'#c8641a');Rc(g,12,2,1,3,'#4f8a3a');Rc(g,13,3,2,1,'#4f8a3a');Rc(g,11,1,1,2,'#6fae4f');});
+ IT('potato','ジャガイモ','Potato',F,g=>{ball(g,8,8.5,5,'#d8b06a','#f0d09a','#a8803a');for(const[x,y]of[[6,7],[10,9],[8,11]])P(g,x,y,'#8a6a32');});
+ IT('baked_potato','ベイクドポテト','Baked Potato',F,g=>{ball(g,8,8.5,5,'#a8743a','#d8a060','#7a4a1e');Rc(g,6,6,4,2,'#f6e08a');});
+ IT('pumpkin_pie','パンプキンパイ','Pumpkin Pie',F,g=>{Rc(g,2,7,12,6,'#c98a3a');Rc(g,3,6,10,5,'#f08a2a');Rc(g,3,6,10,1,'#f6b05a');Rc(g,2,12,12,1,'#8a5a22');for(const x of[5,8,11])P(g,x,8,'#c8641a');});
+ IT('cooked_beef','ステーキ','Steak',F,g=>{ball(g,8,8,5.5,'#8a4a2a','#b8703a','#5a2a14');Rc(g,10,4,2,2,'#e8d0b0');Rc(g,5,8,4,1,'#5a2a14');});
+ IT('cooked_porkchop','焼き豚','Cooked Porkchop',F,g=>{ball(g,7.5,8.5,5,'#c87a4a','#e8a070','#8a4a2a');Rc(g,11,4,3,3,'#f0e0c8');Rc(g,4,9,6,1,'#8a4a2a');});
+ IT('cooked_chicken','焼き鳥','Cooked Chicken',F,g=>{ball(g,6.5,9,4.5,'#c8843a','#e8b060','#8a5a22');for(let t=0;t<5;t++)Rc(g,9+t,6-t,2,2,'#f0e0c8');Rc(g,13,1,2,2,'#ffffff');});
+ IT('cooked_salmon','焼き鮭','Cooked Salmon',F,g=>{for(let x=2;x<14;x++){const h=x<4||x>11?2:4;Rc(g,x,8-(h>>1),1,h,'#e88a5a');}Rc(g,13,5,2,6,'#c86a3a');Rc(g,3,8,9,1,'#f6c0a0');P(g,4,7,'#2b2b2b');});
+ // 素材
+ const M='素材';
+ const ingot=(c1,c2,c3)=>g=>{Rc(g,5,5,8,1,c1);Rc(g,4,6,10,2,c1);Rc(g,2,8,12,3,c2);Rc(g,2,11,12,1,c3);Rc(g,3,9,3,1,c1);Rc(g,13,8,1,3,c3);};
+ const gem=(c1,c2,c3)=>g=>{const rows=[[6,9],[4,11],[3,12],[3,12],[4,11],[5,10],[6,9],[7,8]];rows.forEach(([a,b],i)=>{for(let x=a;x<=b;x++)P(g,x,i+4,i<2?c1:x>(a+b)/2?c3:c2);});P(g,6,6,'#ffffff');};
+ IT('coal','石炭','Coal',M,g=>{ball(g,8,8.5,5.5,'#3a3a3e','#6a6a70','#1e1e22');P(g,6,6,'#8a8a90');P(g,10,9,'#5a5a60');});
+ IT('iron_ingot','鉄インゴット','Iron Ingot',M,ingot('#ffffff','#d8d8d8','#8a8a8a'));
+ IT('copper_ingot','銅インゴット','Copper Ingot',M,ingot('#f6c098','#d8844a','#8a4a2a'));
+ IT('gold_ingot','金インゴット','Gold Ingot',M,ingot('#fff6a0','#f2cf3a','#a8801a'));
+ IT('netherite_ingot','ネザライトインゴット','Netherite Ingot',M,ingot('#8a7e82','#4a4246','#2a2428'));
+ IT('diamond','ダイヤモンド','Diamond',M,gem('#d8fffa','#4fe0d8','#1f9a9a'));
+ IT('emerald','エメラルド','Emerald',M,gem('#b8ffc8','#2fd05a','#1a8a3a'));
+ IT('lapis_lazuli','ラピスラズリ','Lapis Lazuli',M,g=>{ball(g,7,8,4.5,'#2a4ab8','#5a7ae8','#1a2a7a');ball(g,11,11,2.5,'#2a4ab8',null,'#1a2a7a');P(g,6,7,'#c8d8ff');});
+ IT('redstone','レッドストーンダスト','Redstone Dust',M,g=>{for(const[x,y,r]of[[6,7,2.5],[10,9,2.5],[7,11,2],[11,5,1.6],[4,11,1.4]])ball(g,x,y,r,'#d82a1a','#ff6a4a','#8a1a10');});
+ IT('stick','棒','Stick',M,g=>{for(let t=0;t<11;t++){P(g,3+t,13-t,'#8a5f34');P(g,4+t,13-t,'#5a3d22');}});
+ IT('string','糸','String',M,g=>{const pts=[[3,12],[4,10],[6,9],[8,10],[9,8],[8,6],[10,5],[12,4],[13,3]];pts.forEach(([x,y])=>{P(g,x,y,'#f4f4f4');P(g,x+1,y,'#c8c8c8');});});
+ IT('feather','羽根','Feather',M,g=>{for(let t=0;t<10;t++){Rc(g,3+t,12-t,1,1,'#a8a8a8');Rc(g,3+t,10-t,Math.min(3,1+t/3|0),2,'#f4f4f4');Rc(g,5+t,12-t,1,1,'#d8d8d8');}});
+ IT('flint','火打石','Flint',M,g=>{const rows=[[7,8],[6,10],[5,11],[4,11],[4,12],[5,11],[6,10]];rows.forEach(([a,b],i)=>{for(let x=a;x<=b;x++)P(g,x,i+5,x<a+2?'#6a6a70':'#3a3a3e');});});
+ IT('leather','革','Leather',M,g=>{Rc(g,3,3,10,10,'#a8643a');Rc(g,2,5,12,6,'#a8643a');Rc(g,4,4,8,1,'#c8844a');for(const[x,y]of[[2,4],[13,4],[2,11],[13,11]])P(g,x,y,'#00000000');Rc(g,4,12,8,1,'#7a4a24');});
+ IT('bone','骨','Bone',M,g=>{for(let t=0;t<9;t++){P(g,4+t,11-t,'#f4f0e0');P(g,5+t,11-t,'#d8d0b8');}for(const[x,y]of[[2,12],[3,13],[2,10],[4,13],[12,2],[13,3],[11,1],[14,4]])Rc(g,x,y,2,2,'#f4f0e0');});
+ IT('slime_ball','スライムボール','Slimeball',M,g=>{ball(g,8,8.5,5,'#6ad84a','#b8ff98','#3a9a2a');});
+ IT('ender_pearl','エンダーパール','Ender Pearl',M,g=>{ball(g,8,8,5.5,'#1a6a5a','#4ab8a0','#0e3a32');Rc(g,7,7,2,2,'#7ae8c8');},{stack:16});
+ IT('ender_eye','エンダーアイ','Eye of Ender',M,g=>{ball(g,8,8,5.5,'#3a8a3a','#7ad87a','#1e4a1e');Rc(g,6,6,4,4,'#d8f0a0');Rc(g,7,7,2,2,'#1a1a1a');});
+ IT('blaze_rod','ブレイズロッド','Blaze Rod',M,g=>{for(let t=0;t<11;t++){P(g,3+t,13-t,'#f2c13a');P(g,4+t,13-t,'#d87a1a');}P(g,3,13,'#fff27a');});
+ IT('nether_star','ネザースター','Nether Star',M,g=>{for(let i=0;i<7;i++){P(g,8,1+i,'#f4f4ff');P(g,8,14-i,'#f4f4ff');P(g,1+i,8,'#f4f4ff');P(g,14-i,8,'#f4f4ff');}ball(g,8.5,8.5,3,'#ffffff',null,'#d8d8f0');for(let i=0;i<4;i++){P(g,4+i,4+i,'#d8d8f0');P(g,12-i,4+i,'#d8d8f0');P(g,4+i,12-i,'#d8d8f0');P(g,12-i,12-i,'#d8d8f0');}});
+ IT('gunpowder','火薬','Gunpowder',M,g=>{for(const[x,y,r]of[[7,9,3],[10,10,2.5],[6,12,2],[9,6,2]])ball(g,x,y,r,'#6a6a6a','#9a9a9a','#3a3a3a');});
+ IT('arrow','矢','Arrow',M,g=>{for(let t=0;t<10;t++)P(g,3+t,12-t,'#8a5f34');Rc(g,12,2,2,2,'#c8c8c8');P(g,11,2,'#c8c8c8');P(g,13,4,'#c8c8c8');for(const[x,y]of[[2,11],[3,13],[1,12],[4,14],[2,13]])P(g,x,y,'#f4f4f4');});
+ // そのほか
+ const O='そのほか';
+ const bucket=fill=>g=>{Rc(g,3,5,10,8,'#c8c8cc');Rc(g,4,12,8,2,'#9a9aa0');Rc(g,3,5,10,1,'#e8e8ec');if(fill)Rc(g,4,6,8,2,fill);Rc(g,2,4,1,2,'#9a9aa0');Rc(g,13,4,1,2,'#9a9aa0');Rc(g,3,3,10,1,'#6a6a70');};
+ IT('bucket','バケツ','Bucket',O,bucket(null),{stack:16});
+ IT('water_bucket','水入りバケツ','Water Bucket',O,bucket('#3a6fd8'),{stack:1});
+ IT('lava_bucket','溶岩入りバケツ','Lava Bucket',O,bucket('#f28a1a'),{stack:1});
+ IT('shears','ハサミ','Shears',O,g=>{for(let t=0;t<7;t++){P(g,8+t,8-t,'#e0e0e4');P(g,9+t,8-t,'#a8a8b0');P(g,7-t,8-t,'#e0e0e4');P(g,6-t,8-t,'#a8a8b0');}P(g,7,8,'#6a6a70');P(g,8,8,'#6a6a70');for(const cx of[4.5,11.5]){ball(g,cx,12,2.8,'#c8452a',null,'#8a2a1a');g.clearRect(cx|0,11,1,2);}},{stack:1});
+ IT('flint_and_steel','火打石と打ち金','Flint and Steel',O,g=>{Rc(g,2,3,5,7,'#3a3a3e');Rc(g,3,4,2,2,'#6a6a70');Rc(g,8,8,6,2,'#b8b8c0');Rc(g,12,6,2,6,'#b8b8c0');Rc(g,8,10,4,1,'#7a7a80');},{stack:1});
+ IT('lead','リード','Lead',O,g=>{for(let a=0;a<6.28;a+=.15){const x=8+Math.cos(a)*5,y=8+Math.sin(a)*4;P(g,x|0,y|0,'#c8a06a');}Rc(g,10,10,4,4,'#8a6a3a');Rc(g,11,11,2,2,'#c8a06a');});
+ IT('name_tag','名札','Name Tag',O,g=>{Rc(g,4,4,9,8,'#e8d0a0');Rc(g,2,6,2,4,'#e8d0a0');Rc(g,4,4,9,1,'#f6e8c0');Rc(g,5,7,6,1,'#8a6a3a');Rc(g,5,9,4,1,'#8a6a3a');P(g,3,7,'#8a6a3a');});
+ IT('saddle','鞍','Saddle',O,g=>{Rc(g,3,5,10,5,'#8a4a24');Rc(g,2,4,3,3,'#a8643a');Rc(g,11,4,3,3,'#a8643a');Rc(g,4,5,8,1,'#c8844a');Rc(g,7,10,2,4,'#5a3d22');Rc(g,6,13,4,1,'#9a9aa0');},{stack:1});
+ IT('map','地図','Map',O,g=>{Rc(g,2,2,12,12,'#d8c898');Rc(g,3,3,10,10,'#c8e8a0');Rc(g,7,3,6,5,'#6ab0e0');Rc(g,3,9,4,4,'#8ac860');P(g,9,10,'#d8332a');Rc(g,2,2,12,1,'#a89868');});
+ IT('egg','卵','Egg',O,g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){const d=((x+.5-8)/4.5)**2+((y+.5-9)/5.5)**2;if(d<=1)P(g,x,y,d>.7&&x>8?'#c8b088':'#f4e8c8');}P(g,6,6,'#ffffff');},{stack:16});
+ IT('snowball','雪玉','Snowball',O,g=>{ball(g,8,8.5,5,'#f4f8ff','#ffffff','#c8d8e8');},{stack:16});
+ IT('totem_of_undying','不死のトーテム','Totem of Undying',O,g=>{Rc(g,5,2,6,6,'#f2cf3a');Rc(g,6,4,1,1,'#2fa84a');Rc(g,9,4,1,1,'#2fa84a');Rc(g,6,6,4,1,'#b08a1a');Rc(g,2,8,12,2,'#f2cf3a');Rc(g,5,10,6,4,'#f2cf3a');Rc(g,6,10,4,1,'#2fa84a');Rc(g,5,14,6,1,'#b08a1a');},{stack:1});
+}
+
 // 自然
 add('grass_block','草ブロック','Grass Block','nature','nature','cube',{up:T('grass_t',P.grassTop),down:T('dirt',P.dirt),side:T('grass_s',P.grassSide)});
 add('dirt','土','Dirt','nature','nature','cube',tileIdx['dirt']);
@@ -647,6 +883,7 @@ add('moss_block','苔ブロック','Moss Block','nature','nature','cube',T('moss
   front:T('chis_e',g=>{F(g,'#3a2614');Q(g,0,0,16,1,'#8a6a44');Q(g,0,7,16,2,'#8a6a44');Q(g,0,15,16,1,'#8a6a44');Q(g,0,0,1,16,'#8a6a44');Q(g,15,0,1,16,'#8a6a44');Q(g,5,0,1,16,'#8a6a44');Q(g,10,0,1,16,'#8a6a44');}),
   book:T('chis_b',g=>{CLR(g);const cols=['#b33a32','#3a5fa8','#4f8a3a','#c99a2e','#7a4aa0','#2f8a8a'];for(const y0 of[1,9])for(let x=1;x<15;x++){if(x===5||x===10)continue;const c=cols[(x*3+y0)%6],h=5+((x+y0)%2);Q(g,x,y0+6-h,1,h,c);Q(g,x,y0+6-h,1,1,lt(c,.35));}})},{sub:'作業台・道具'});
  add('book','本','Book','deco','craft','item',T('book_i',g=>{CLR(g);Q(g,2,2,12,12,'#8a3a22');Q(g,3,3,10,10,'#a84a2a');Q(g,12,2,2,12,'#ece4d4');Q(g,5,6,6,1,'#e8c85a');}),{flat:tileIdx['book_i'],sub:'作業台・道具',note:'模様入りの本棚に入れて使います'});
+ add('writable_book','本と羽根ペン','Book and Quill','deco','craft','item',T('wbook_i',g=>{CLR(g);Q(g,2,3,11,11,'#6b3a22');Q(g,3,4,9,9,'#8a4a2a');Q(g,11,3,2,11,'#ece4d4');Q(g,9,1,2,2,'#f4f4f4');Q(g,10,3,1,7,'#e8e8e8');Q(g,8,9,2,2,'#2b2b2b');}),{flat:tileIdx['wbook_i'],sub:'作業台・道具',note:'書見台をタップすると、その上に置けます'});
  W2('beehive','養蜂箱','Beehive',{up:T('hive_t',g=>{P.planks(g,'#c9a26a');border(g,'#8a6a44');}),down:T('hive_t',()=>{}),side:T('hive_s',g=>{P.planks(g,'#c9a26a');Q(g,0,0,16,3,'#8a6a44');Q(g,0,13,16,3,'#8a6a44');}),front:T('hive_f',g=>{P.planks(g,'#c9a26a');Q(g,0,0,16,3,'#8a6a44');Q(g,0,13,16,3,'#8a6a44');Q(g,6,8,4,3,'#3a2410');})},{facing:'h'});
  add('composter','コンポスター','Composter','deco','wood','composter',{side:T('comp_s',g=>{P.planks(g,'#8a6a44');Q(g,0,0,16,2,DK);Q(g,0,14,16,2,DK);}),top:T('comp_t',g=>{F(g,'#5a3d22');specks(g,'#5a3d22',30,.2);})},{sub:'作業台・道具'});
  add('target','的','Target','deco','craft','cube',{up:T('target_t',g=>{F(g,'#e8dcc4');ring(g,2,12,'#c83a32');ring(g,5,6,'#c83a32');Q(g,7,7,2,2,'#c83a32');}),side:T('target_s',g=>{F(g,'#e8dcc4');ring(g,2,12,'#c83a32');ring(g,5,6,'#c83a32');Q(g,7,7,2,2,'#c83a32');specks(g,'#d8c8a8',10,.05);})},{sub:'作業台・道具'});
@@ -665,7 +902,7 @@ const CHIS_SLOTS=[[11,8,16,16],[5,8,11,16],[0,8,5,16],[11,0,16,8],[5,0,11,8],[0,
 function chisSlot(c,fx,fy,fz){let x=fx*16,z=fz*16;for(let i=0;i<((4-((c.f??2)%4))%4);i++){const nx=16-z;z=x;x=nx;}const px=16-x,py=16-fy*16;return(py<8?0:3)+(px<5?0:px<11?1:2);}
 // 植木鉢に植えられるもの（マイクラと同じく、草とサトウキビは植えられない）
 const POTTABLE=new Set(['poppy','dandelion','cornflower','oxeye_daisy','allium','pink_tulip','lily_of_the_valley','fern','red_mushroom','brown_mushroom','azalea','flowering_azalea']);
-const CATS=[['wood','木材'],['stone','石・レンガ'],['color','色ブロック'],['glass','ガラス'],['light','照明'],['furn','家具・道具'],['deco','雑貨'],['nature','自然']];
+const CATS=[['wood','木材'],['stone','石・レンガ'],['color','色ブロック'],['glass','ガラス'],['light','照明'],['furn','家具・道具'],['deco','雑貨'],['tool','アイテム'],['nature','自然']];
 const MGROUPS=[['wood','木を切ってクラフトするもの'],['stone','石や砂を掘る・かまどで焼くもの'],['color','染料で色を付けるもの'],['nature','自然から集めるもの'],['craft','ほかの素材や道具がいるもの']];
 const stackOf=id=>B[id].stack||64;
 
@@ -706,6 +943,8 @@ function connects(d,dir,x,y,z,get){const v=DV[dir],n=get(x+v[0],y+v[1],z+v[2]);i
  // 塀は、塀・ブロック・ガラス板・鉄格子・横向きのゲートとつながる
  if(d.model==='wall')return m==='wall'||m==='pane'||m==='bars'||isCube(n)||gateSide;
  return m==='pane'||m==='bars'||m==='wall'||isCube(n);}
+// 組になっているチェストの相手を返す（相手が消えた・向きが変わったときは組ではない＝小さいチェストに戻る）
+function chestPair(c,x,y,z,gt){if(typeof c.pd!=='number'||!gt)return null;const v=HV[c.pd],n=gt(x+v[0],y,z+v[1]);return n&&n.id===c.id&&(n.f??2)===(c.f??2)&&n.pd===(c.pd+2)%4?n:null;}
 function geom(d,c,x,y,z,get){
  const tx=d.tex;
  switch(d.model){
@@ -745,7 +984,11 @@ function geom(d,c,x,y,z,get){
   if(c.open){for(const x0 of[0,14])b.push(bx([x0,6,1],[x0+2,15,3],f),bx([x0,6,3],[x0+2,9,7],f),bx([x0,12,3],[x0+2,15,7],f));}
   else b.push(bx([6,6,7],[8,15,9],f),bx([8,6,7],[10,15,9],f),bx([2,6,7],[6,9,9],f),bx([2,12,7],[6,15,9],f),bx([10,6,7],[14,9,9],f),bx([10,12,7],[14,15,9],f));
   return{boxes:b.map(q=>rotY(q,c.f||0))};}
- case'trapdoor':{const f=fmap(tx);let b;if(c.open)b=rotY(bx([0,0,13],[16,16,16],f),c.f||0);else b=c.h==='top'?bx([0,13,0],[16,16,16],f):bx([0,0,0],[16,3,16],f);return{boxes:[b]};}
+ // トラップドア：模様の上側を「向いている方」（ちょうつがいの反対側）に合わせる。開くとちょうつがい側に立つ
+ case'trapdoor':{const k=c.f||0,f=fmap(tx);let b;
+  if(c.open){const g=Object.assign({},f);if(c.h==='top'){g.north={t:f.north.t,r:2};g.south={t:f.south.t,r:2};}b=rotY(bx([0,0,13],[16,16,16],g),k);}
+  else{f.up={t:f.up.t,r:k};f.down={t:f.down.t,r:(6-k)%4};b=c.h==='top'?bx([0,13,0],[16,16,16],f):bx([0,0,0],[16,3,16],f);}
+  return{boxes:[b]};}
  case'torch':{const s=FT(tx.side),t=FT(tx.top);
   if(c.w===undefined||c.w<0)return{boxes:[bx([7,0,7],[9,10,9],{north:s,south:s,east:s,west:s,up:t,down:t})]};
   // 壁の松明：根元を壁に付けて、上を外側へ22.5度傾ける（マイクラと同じ角度）
@@ -764,7 +1007,10 @@ function geom(d,c,x,y,z,get){
   const boxes=[bx([0,3,0],[16,9,16],{up:{t:head?tx.head:tx.foot,r:k},down:w,north:s,south:s,east:s,west:s})];
   for(const[lx,lz]of head?[[0,0],[13,0]]:[[0,13],[13,13]])boxes.push(bx([lx,0,lz],[lx+3,3,lz+3],fmap(tx.bottom)));
   return{boxes:boxes.map(b=>rotY(b,k))};}
- case'chest':{const f=fmap({up:tx.top,down:tx.top,side:tx.side});f.north=FT(tx.front);return{boxes:[rotY(bx([1,0,1],[15,14,15],f),c.f??2)]};}
+ // チェスト：同じ向きのチェストと横に組になっていれば、大きいチェストとしてつなげて描く
+ case'chest':{const k=c.f??2,pr=chestPair(c,x,y,z,get),pl=pr?(c.pd-k+4)%4:-1;
+  const f=fmap({up:pl<0?tx.top:tx.topP,down:pl<0?tx.top:tx.topP,side:tx.side});f.north=FT(pl<0?tx.front:pl===1?tx.frontL:tx.frontR);
+  return{boxes:[rotY(bx([pl===3?0:1,0,1],[pl===1?16:15,14,15],f),k)]};}
  case'candle':{const f=fmap({up:tx.top,down:tx.top,side:tx.side});const L=[[[7,7,6]],[[5,7,6],[9,6,5]],[[5,6,6],[9,7,5],[7,10,4]],[[5,5,6],[9,5,5],[5,9,5],[9,9,4]]][(c.n||1)-1];return{boxes:L.map(([px,pz,h])=>bx([px,0,pz],[px+2,h,pz+2],f))};}
  case'fpot':{const r={boxes:[bx([5,0,5],[11,6,11],fmap({up:tx.top,down:tx.side,side:tx.side}))]},pd=c.plant&&B[c.plant];
   // 植えた植物：花やキノコは小さめの十字、ツツジは小さな株
@@ -773,7 +1019,12 @@ function geom(d,c,x,y,z,get){
   return r;}
  case'dpot':{const f=fmap({up:tx.top,down:tx.side,side:tx.side});return{boxes:[bx([1,0,1],[15,13,15],f),bx([4,13,4],[12,16,12],f)]};}
  case'cake':return{boxes:[bx([1,0,1],[15,8,15],fmap({up:tx.top,down:tx.bottom,side:tx.side}))]};
- case'lectern':{const s=fmap(tx.side),t=fmap({up:tx.top,down:tx.side,side:tx.side});return{boxes:[bx([0,0,0],[16,2,16],s),bx([4,2,4],[12,12,12],s),rotY(bx([1,12,1],[15,15,15],t),c.f??2)]};}
+ // 書見台：天板は手前（置いた人の側＝向いている方）が低い斜め。本を置くと天板の上に開いた本が乗る
+ case'lectern':{const s=fmap(tx.side),t=fmap({up:tx.top,down:tx.side,side:tx.side}),k=c.f??2,fv=HV[k];
+  const xf=v=>{const sx=(v[0]-8)*fv[0]+(v[2]-8)*fv[1];return[v[0],v[1]+1-(sx+8)/16*5,v[2]];};
+  const top=rotY(bx([0,11,1],[16,15,15],t),k);top.xf=xf;const bs=[bx([0,0,0],[16,2,16],s),bx([4,2,4],[12,12,12],s),top];
+  if(c.book){const bt=FT(tx.book);bt.r=(k+2)%4;const bk=rotY(bx([2,15,3],[14,15.6,13],{north:FT(tx.side),south:FT(tx.side),east:FT(tx.side),west:FT(tx.side),up:bt,down:FT(tx.side)}),k);bk.xf=xf;bs.push(bk);}
+  return{boxes:bs};}
  case'cauldron':{const f=fmap(tx),b=[];for(const[lx,lz]of[[0,0],[12,0],[0,12],[12,12]])b.push(bx([lx,0,lz],[lx+4,3,lz+4],f));
   b.push(bx([0,3,0],[16,4,16],f),bx([0,4,0],[2,16,16],f),bx([14,4,0],[16,16,16],f),bx([2,4,0],[14,16,2],f),bx([2,4,14],[14,16,16],f));return{boxes:b};}
  case'brewing':{const r=fmap(tx.rod),b=fmap(tx.base);return{boxes:[bx([7,0,7],[9,14,9],r),bx([2,0,6],[6,2,10],b),bx([9,0,2],[13,2,6],b),bx([9,0,10],[13,2,14],b)]};}
@@ -781,8 +1032,16 @@ function geom(d,c,x,y,z,get){
   if(c.att==='ceiling')return{boxes:[bx([5,13,4],[11,16,12],b),bx([7,6,7],[9,13,9],h)]};
   if(c.att==='wall')return{boxes:[rotY(bx([5,4,13],[11,12,16],b),c.f||0),rotY(bx([7,7,6],[9,9,13],h),c.f||0)]};
   return{boxes:[bx([5,0,4],[11,3,12],b),bx([7,3,7],[9,10,9],h)]};}
- case'painting':{const f=fmap(tx.edge);f.north=FT(tx.front);return{boxes:[rotY(bx([0,0,15],[16,16,16],f),c.f||0)]};}
- case'frame':return{boxes:[rotY(bx([2,2,15],[14,14,16],fmap(tx)),c.f||0)]};
+ // 絵画：大きい絵は、マスごとに1枚ずつ板を並べる（左右は壁に向かって見たとき。真ん中寄りのマスが置いた場所）
+ case'painting':{const k=c.f||0,pw=d.pw||1,ph=d.ph||1,arts=tx.arts,art=arts[((c.art||0)%arts.length+arts.length)%arts.length],l=Math.floor((pw-1)/2),dd=Math.floor((ph-1)/2),L=HV[(k+1)%4],out=[];
+  for(let i=0;i<pw;i++)for(let j=0;j<ph;j++){const f=fmap(tx.edge);f.north=FT(art[ph-1-j][i]);const b=rotY(bx([0,0,15],[16,16,16],f),k),o=[L[0]*(l-i)*16,(j-dd)*16,L[1]*(l-i)*16];
+   if(o[0]||o[1]||o[2]){b.a=b.a.map((v,n)=>v+o[n]);b.b=b.b.map((v,n)=>v+o[n]);b.wrap=1;}out.push(b);}
+  return{boxes:out};}
+ // 額縁：飾った道具は、額の手前に平らな絵として描く（タップするたびに45度ずつ回る）
+ case'frame':{const k=c.f||0,r={boxes:[rotY(bx([2,2,15],[14,14,16],fmap(tx)),k)]};
+  if(c.item&&B[c.item]){const it=rotY(bx([3,3,14.85],[13,13,14.85],{north:FT(B[c.item].flat)}),k),an=(c.rot||0)*Math.PI/4,cs=Math.cos(an),sn=Math.sin(an),ev=k%2===0,sg=(k===0||k===3)?1:-1;
+   if(c.rot)it.xf=v=>{const h=(ev?v[0]:v[2])-8,y=v[1]-8,nh=h*cs-y*sn*sg,ny=h*sn*sg+y*cs;return ev?[nh+8,ny+8,v[2]]:[v[0],ny+8,nh+8];};r.cutBoxes=[it];}
+  return r;}
  case'shelf':{const p=fmap(tx.side),k=c.f??2,bk=fmap(tx.side);bk.north=FT(tx.front);
   return{boxes:[bx([0,0,13],[16,16,16],bk),bx([0,0,8],[16,2,13],p),bx([0,14,8],[16,16,13],p),bx([0,2,8],[1,14,13],p),bx([15,2,8],[16,14,13],p)].map(b=>rotY(b,k))};}
  case'cross':return{boxes:[],cross:tx};
@@ -893,9 +1152,11 @@ const CORN={
 const onEdge=(dir,a,b)=>dir==='up'?b[1]===16:dir==='down'?a[1]===0:dir==='north'?a[2]===0:dir==='south'?b[2]===16:dir==='west'?a[0]===0:b[0]===16;
 function newBuf(){return{p:[],u:[],c:[],i:[],info:[]};}
 // P があれば位置だけ P を使う（傾いた松明など）。模様の向きは V で決める
-function quad(buf,x,y,z,V,t,r,dir,sh,info,P){
+function quad(buf,x,y,z,V,t,r,dir,sh,info,P,wrap){
  const n=buf.p.length/3,[tx,ty]=tilePos(t);
- V.forEach((v,i)=>{const pv=P?P[i]:v;buf.p.push(x+pv[0]/16,y+pv[1]/16,z+pv[2]/16);let q=dir==='cross'?v[3]:uvOf(dir,v[0],v[1],v[2]);for(let k=0;k<r;k++)q=[q[1],16-q[0]];
+ // wrap：マスの外にはみ出した板（大きい絵）は、その板がいるマスの中の位置で絵を貼る
+ const sh0=wrap?(()=>{const qs=V.map(v=>uvOf(dir,v[0],v[1],v[2]));return[0,1].map(a=>Math.floor((Math.min(...qs.map(q=>q[a]))+.01)/16)*16);})():null;
+ V.forEach((v,i)=>{const pv=P?P[i]:v;buf.p.push(x+pv[0]/16,y+pv[1]/16,z+pv[2]/16);let q=dir==='cross'?v[3]:uvOf(dir,v[0],v[1],v[2]);if(sh0)q=[q[0]-sh0[0],q[1]-sh0[1]];for(let k=0;k<r;k++)q=[q[1],16-q[0]];
   const px=Math.min(15.98,Math.max(.02,q[0])),py=Math.min(15.98,Math.max(.02,q[1]));buf.u.push((tx+px)/AW,1-(ty+py)/AH);buf.c.push(sh,sh,sh);});
  buf.i.push(n,n+1,n+2,n,n+2,n+3);buf.info.push(info);
 }
@@ -929,16 +1190,16 @@ function meshCells(cells,get,bufOf){
  for(const c of cells){
   const d=B[c.id],{x,y,z}=c,g=geom(d,c,x,y,z,get),buf=bufOf(d),cutBuf=bufOf({alpha:'cut'});
   // 植木鉢の葉など、透ける部分は別のバッファに描く
-  for(const b of g.cutBoxes||[])for(const dir of DIRS){const fc=b.f[dir];if(!fc)continue;quad(cutBuf,x,y,z,CORN[dir](b.a,b.b),fc.t,fc.r||0,dir,SHADE[dir],{x,y,z,dir});}
+  for(const b of g.cutBoxes||[])for(const dir of DIRS){const fc=b.f[dir];if(!fc)continue;{const V=CORN[dir](b.a,b.b);quad(cutBuf,x,y,z,V,fc.t,fc.r||0,dir,SHADE[dir],{x,y,z,dir},b.xf?V.map(b.xf):null);}}
   for(const b of g.boxes){
    for(const dir of DIRS){const fc=b.f[dir];if(!fc)continue;
-    if(!b.xf&&onEdge(dir,b.a,b.b)){const v=DV[dir],n=get(x+v[0],y+v[1],z+v[2]);
+    if(!b.xf&&!b.wrap&&onEdge(dir,b.a,b.b)){const v=DV[dir],n=get(x+v[0],y+v[1],z+v[2]);
      if(n){const nd=B[n.id];if(isOpaqueFull(n))continue;
       if(d.alpha==='glass'&&d.model==='cube'&&n.id===c.id)continue;
       if((d.model==='pane'||d.model==='bars')&&(nd.model==='pane'||nd.model==='bars')&&(dir!=='up'&&dir!=='down'))continue;
       if(d.model==='fence'&&nd.model==='fence'&&dir!=='up'&&dir!=='down')continue;
       if(d.model==='wall'&&nd.model==='wall'&&dir!=='up'&&dir!=='down')continue;}}
-    {const V=CORN[dir](b.a,b.b);quad(buf,x,y,z,V,fc.t,fc.r||0,dir,d.emit?1:SHADE[dir],{x,y,z,dir},b.xf?V.map(b.xf):null);}
+    {const V=CORN[dir](b.a,b.b);quad(buf,x,y,z,V,fc.t,fc.r||0,dir,d.emit?1:SHADE[dir],{x,y,z,dir},b.xf?V.map(b.xf):null,b.wrap);}
    }
   }
   if(g.cross!==undefined){const sh=.92,cr=typeof g.cross==='number'?{t:g.cross,a:2,b:14,y0:0,y1:16}:g.cross,{a,b,y0,y1}=cr,cb=d.alpha==='cut'?buf:cutBuf;
@@ -1032,8 +1293,19 @@ function placeCell0(x,y,z,dir,fy,pf,quiet){
   case'torch':if(dir==='down')return fail('松明は天井には付けられません');c.w=hd;break;
   case'lantern':c.hang=dir==='down';break;
   case'lever':if(dir==='up')c.att='floor';else if(dir==='down')c.att='ceiling';else{c.att='wall';c.f=hd;}break;
-  case'painting':case'frame':if(hd<0)return fail('壁の横の面をタップして掛けてください');c.f=hd;break;
-  case'chest':case'shelf':case'lectern':c.f=(pf+2)%4;break;
+  case'frame':if(hd<0)return fail('壁の横の面をタップして掛けてください');c.f=hd;break;
+  // 絵画：絵が掛かるマスが全部空いていて、その後ろが全部壁のときだけ掛けられる（マイクラと同じ）
+  case'painting':{if(hd<0)return fail('壁の横の面をタップして掛けてください');c.f=hd;const pw=d.pw||1,ph=d.ph||1,l=Math.floor((pw-1)/2),dd=Math.floor((ph-1)/2),L=HV[(hd+1)%4],bk=HV[hd];
+   for(let i=0;i<pw;i++)for(let j=0;j<ph;j++){const cx=x+L[0]*(l-i),cy=y+j-dd,cz=z+L[1]*(l-i);if((i!==l||j!==dd)&&!free(cx,cy,cz))return fail(`横${pw}×縦${ph}の絵を掛ける場所が空いていません`);if(!get(cx-bk[0],cy,cz-bk[1]))return fail(`この絵の後ろには、横${pw}×縦${ph}マスの壁が必要です`);}
+   c.art=0;break;}
+  case'chest':{c.f=(pf+2)%4;
+   // マイクラと同じ：小さいチェストの横の面に付けると、その向きに合わせて大きいチェストになる。
+   // それ以外は、左右に同じ向きの小さいチェストがあれば組になる（向きが違うと組にならない）
+   const single=(n,a,e)=>n&&n.id===d.id&&!chestPair(n,a,y,e,get)?n:null;
+   if(hd>=0){const v=HV[hd],sx=x-v[0],sz=z-v[1],src=single(world.get(K(sx,y,sz)),sx,sz);if(src&&((hd-(src.f??2)+4)%2===1)){c.f=src.f??2;c.pd=(hd+2)%4;src.pd=hd;break;}}
+   for(const sd of[(c.f+1)%4,(c.f+3)%4]){const v=HV[sd],nx=x+v[0],nz=z+v[1],n=single(world.get(K(nx,y,nz)),nx,nz);if(n&&(n.f??2)===c.f){c.pd=sd;n.pd=(sd+2)%4;break;}}
+   break;}
+  case'shelf':case'lectern':c.f=(pf+2)%4;break;
   case'gate':case'campfire':case'cutter':c.f=pf;break;
   case'anvil':c.f=(pf+1)%4;break;
   case'chiseled':c.f=(pf+2)%4;c.books=0;break;
@@ -1059,6 +1331,9 @@ function placeAt(h,pf){
   // 本を持って模様入りの本棚の正面をタップすると、その棚に本が入る
   if(cd.model==='chiseled'&&d.id==='book'){if(h.dir!==HD[clicked.f??2]){status('本は本棚の正面をタップして入れてください',true);return null;}
    const s=chisSlot(clicked,h.fx,h.fy,h.fz),m=clicked.books||0;if(m&1<<s){status('その棚にはもう本が入っています',true);return null;}clicked.books=m|1<<s;changed();return null;}
+  if(cd.model==='painting'&&d.id===clicked.id){const n=cd.tex.arts.length;clicked.art=((clicked.art||0)+1)%n;changed();status(`絵柄を変えました（${clicked.art+1}／${n}）`,'info');return null;}
+  if(cd.model==='frame'&&d.frameable){if(clicked.item===d.id){clicked.rot=((clicked.rot||0)+1)%8;status('飾った道具を45度回しました','info');}else{clicked.item=d.id;clicked.rot=0;status(`額縁に${d.ja}を飾りました。同じ道具でタップすると回ります`,'info');}changed();return null;}
+  if(cd.model==='lectern'&&(d.id==='writable_book'||d.id==='book')){if(d.id==='book'){status('書見台には『本と羽根ペン』を置きます（ブロック一覧の雑貨にあります）',true);return null;}clicked.book=!clicked.book;changed();status(clicked.book?'書見台に本と羽根ペンを置きました':'書見台から本と羽根ペンを外しました','info');return null;}
   if(cd.model==='fpot'&&POTTABLE.has(d.id)){if(clicked.plant===d.id)return null;clicked.plant=d.id;changed();status(`植木鉢に${d.ja}を植えました`,'info');return null;}
   if(clicked.id===d.id){
    if(d.model==='slab'&&clicked.t!=='double'&&(((clicked.t||'bottom')==='bottom'&&h.dir==='up')||(clicked.t==='top'&&h.dir==='down'))){clicked.t='double';changed();return null;}
@@ -1110,6 +1385,7 @@ function beginStroke(cx,cy){
   const hc=world.get(K(h.x,h.y,h.z));
   if(mode==='replace'){if(replaceCell(h.x,h.y,h.z,dir,h.fy,pf))changed();}
   // 本の入った棚をタップしたら、まずその本だけ取り出す
+  else if(hc&&B[hc.id].model==='frame'&&hc.item){delete hc.item;delete hc.rot;changed();stroke=null;status('額縁から道具を外しました','info');return;}
   else if(hc&&B[hc.id].model==='chiseled'&&dir===HD[hc.f??2]&&(hc.books||0)&1<<chisSlot(hc,h.fx,h.fy,h.fz)){hc.books&=~(1<<chisSlot(hc,h.fx,h.fy,h.fz));changed();stroke=null;return;}
   else if(breakCell(h.x,h.y,h.z))changed();
   stroke={pl:{axis:ax,surf:b[ax]+(pos?1:0),fixed:b[ax]},last:b,dir,fy:h.fy,pf};
@@ -1169,8 +1445,8 @@ function copySel(cut){
  drawSel();renderSel();
 }
 // 90度回す（上から見て時計回り）
-function rotState(c){c=Object.assign({},c);if(typeof c.f==='number')c.f=(c.f+1)%4;if(typeof c.w==='number'&&c.w>=0)c.w=(c.w+1)%4;if(c.d&&HD.includes(c.d))c.d=HD[(HD.indexOf(c.d)+1)%4];if(c.ax==='x')c.ax='z';else if(c.ax==='z')c.ax='x';return c;}
-function flipState(c){c=Object.assign({},c);const m=f=>f===1?3:f===3?1:f;if(typeof c.f==='number')c.f=m(c.f);if(typeof c.w==='number'&&c.w>=0)c.w=m(c.w);if(c.d==='east')c.d='west';else if(c.d==='west')c.d='east';if(c.hinge)c.hinge=c.hinge==='right'?'left':'right';else if(B[c.id]&&B[c.id].model==='door')c.hinge='right';return c;}
+function rotState(c){c=Object.assign({},c);if(typeof c.f==='number')c.f=(c.f+1)%4;if(typeof c.pd==='number')c.pd=(c.pd+1)%4;if(typeof c.w==='number'&&c.w>=0)c.w=(c.w+1)%4;if(c.d&&HD.includes(c.d))c.d=HD[(HD.indexOf(c.d)+1)%4];if(c.ax==='x')c.ax='z';else if(c.ax==='z')c.ax='x';return c;}
+function flipState(c){c=Object.assign({},c);const m=f=>f===1?3:f===3?1:f;if(typeof c.f==='number')c.f=m(c.f);if(typeof c.pd==='number')c.pd=m(c.pd);if(typeof c.w==='number'&&c.w>=0)c.w=m(c.w);if(c.d==='east')c.d='west';else if(c.d==='west')c.d='east';if(c.hinge)c.hinge=c.hinge==='right'?'left':'right';else if(B[c.id]&&B[c.id].model==='door')c.hinge='right';return c;}
 function rotClip(){paste.cells=normalize(paste.cells.map(([x,y,z,c])=>[-z,y,x,rotState(c)]));drawSel();renderSel();}
 function flipClip(){paste.cells=normalize(paste.cells.map(([x,y,z,c])=>[-x,y,z,flipState(c)]));drawSel();renderSel();}
 function doPaste(){
@@ -1297,8 +1573,8 @@ function palItems(){
  if(ptab==='color')return COLORS.map(c=>[c[1],list.filter(i=>i.startsWith(c[0]+'_'))]);
  if(ptab==='glass')return[['透明なガラス',list.filter(i=>!COLORS.some(c=>i.startsWith(c[0]+'_')))],['色付きガラス',list.filter(i=>i.endsWith('_stained_glass'))],['色付きガラス板',list.filter(i=>i.endsWith('_pane')&&i!=='glass_pane')]];
  if(ptab==='light')return[['松明・ランタン・鎖',list.filter(i=>!i.endsWith('_candle')&&B[i].model!=='cube')],['光るブロック',list.filter(i=>B[i].model==='cube')],['ろうそく',list.filter(i=>i.endsWith('_candle'))]];
- if(ptab==='deco'){const subs=[...new Set(list.map(i=>B[i].sub||'雑貨'))];return subs.map(s=>[s,list.filter(i=>(B[i].sub||'雑貨')===s)]);}
- if(ptab==='furn')return[['家具・道具',list.filter(i=>!i.endsWith('_bed'))],['ベッド',list.filter(i=>i.endsWith('_bed'))]];
+ if(ptab==='deco'||ptab==='tool'){const subs=[...new Set(list.map(i=>B[i].sub||'雑貨'))];return subs.map(s=>[s,list.filter(i=>(B[i].sub||'雑貨')===s)]);}
+ if(ptab==='furn')return[['家具・道具',list.filter(i=>!i.endsWith('_bed')&&B[i].sub!=='絵画・額縁')],['絵画・額縁',list.filter(i=>B[i].sub==='絵画・額縁')],['ベッド',list.filter(i=>i.endsWith('_bed'))]];
  return[['自然',list]];
 }
 function renderPal(){
@@ -1312,7 +1588,7 @@ function stackText(n,id){const st=stackOf(id);if(st===1||n<st)return`${n}個`;co
 let confirmClear=false;
 function renderMats(){
  const tot={};
- for(const c of world.values()){const d=B[c.id];if(d.model==='door'&&c.p==='upper')continue;if(d.model==='bed'&&c.p==='head')continue;let n=1;if(d.model==='slab'&&c.t==='double')n=2;if(d.model==='candle')n=c.n||1;tot[c.id]=(tot[c.id]||0)+n;if(c.plant&&B[c.plant])tot[c.plant]=(tot[c.plant]||0)+1;if(c.books){let k=0;for(let i=0;i<6;i++)if(c.books&1<<i)k++;tot.book=(tot.book||0)+k;}}
+ for(const c of world.values()){const d=B[c.id];if(d.model==='door'&&c.p==='upper')continue;if(d.model==='bed'&&c.p==='head')continue;let n=1;if(d.model==='slab'&&c.t==='double')n=2;if(d.model==='candle')n=c.n||1;const mid=d.matOf||c.id;tot[mid]=(tot[mid]||0)+n;if(c.item&&B[c.item])tot[c.item]=(tot[c.item]||0)+1;if(c.plant&&B[c.plant])tot[c.plant]=(tot[c.plant]||0)+1;if(c.books){let k=0;for(let i=0;i<6;i++)if(c.books&1<<i)k++;tot.book=(tot.book||0)+k;}if(c.book&&d.model==='lectern')tot.writable_book=(tot.writable_book||0)+1;}
  const ids=Object.keys(tot),all=ids.reduce((a,b)=>a+tot[b],0),slots=ids.reduce((a,b)=>a+Math.ceil(tot[b]/stackOf(b)),0);
  $('stats').innerHTML=`<div class="stat"><b>${ids.length}</b><span>種類</span></div><div class="stat"><b>${all.toLocaleString()}</b><span>合計の個数</span></div><div class="stat"><b>${slots}</b><span>インベントリの枠数</span></div><div class="stat"><b>${Math.ceil(slots/27)}</b><span>シュルカーボックス</span></div>`;
  $('mats').innerHTML=ids.length?MGROUPS.map(([g,label])=>{const rows=ids.filter(b=>B[b].mg===g).sort((a,b)=>tot[b]-tot[a]);if(!rows.length)return'';
@@ -1362,7 +1638,7 @@ document.addEventListener('click',e=>{
  else if(t.id==='tSide'){cam.pitch-=.25;updCam();}
  else if(t.id==='zOut'){cam.dist*=1.25;updCam();}
  else if(t.id==='vReset'){Object.assign(cam,camDefault);updCam();}
- else if(t.id==='toPal'){$('palPanel').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}
+ else if(t.id==='toPal'){if(document.documentElement.classList.contains('game')){openMenu('blocks');return;}$('palPanel').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}
  else if(t.id==='clearAsk'){confirmClear=true;renderMats();}
  else if(t.id==='clearNo'){confirmClear=false;renderMats();}
  else if(t.id==='clearYes'){confirmClear=false;pushHist(snap());world.clear();dug.clear();changed();status('全部のブロックを消して、地面も元に戻しました。『戻す』で元に戻せます','info');}
@@ -1449,6 +1725,55 @@ function pickBlock(cx,cy){
 }
 function setMode(){$('mPlace').setAttribute('aria-pressed',mode==='place');$('mBreak').setAttribute('aria-pressed',mode==='break');$('mSel').setAttribute('aria-pressed',mode==='select');$('mRep').setAttribute('aria-pressed',mode==='replace');status();renderSel();drawSel();}
 
+
+// ===== ゲーム画面モード =====
+// 部品を「元の場所の目印」を残してメニューや引き出しに移し、今の画面に戻すときは目印の位置へ戻す
+const homes=new Map();
+function park(el,dest){if(!el)return;if(!homes.has(el)){const ph=document.createComment('home:'+(el.id||''));el.parentNode.insertBefore(ph,el);homes.set(el,ph);}dest.appendChild(el);}
+function unpark(el){const ph=homes.get(el);if(ph&&ph.parentNode)ph.parentNode.insertBefore(el,ph);}
+const PARKS=[['palPanel','gmBlocks'],['layerRow','gmLayer'],['tdOpt','gmOpts'],['fieldBox','gmOpts'],['helpBox','gmHelp'],['discBox','gmDisc'],['matPanel','gmMats']];
+const UIKEY='mcnavi-ui-v1';
+function isGame(){return document.documentElement.classList.contains('game');}
+function setUI(ui,keep){
+ const g=ui==='game';
+ if(g){for(const[a,b]of PARKS)park($(a),$(b));}
+ else{closeMenu();closeDrawer();for(const[a]of PARKS)unpark($(a));}
+ document.documentElement.classList.toggle('game',g);
+ if(!keep)try{localStorage.setItem(UIKEY,ui);}catch(e){}
+ resize();setTimeout(resize,60);
+ if(!g)window.scrollTo(0,0);
+}
+function openMenu(tab){closeDrawer();$('gMenuBox').hidden=false;menuTab(tab||'blocks');}
+function closeMenu(){$('gMenuBox').hidden=true;}
+function menuTab(t){const b=t==='blocks';$('gtBlocks').setAttribute('aria-selected',b);$('gtSet').setAttribute('aria-selected',!b);$('gmBlocks').hidden=!b;$('gmSet').hidden=b;}
+function openDrawer(){closeMenu();$('gDrawer').hidden=false;}
+function closeDrawer(){$('gDrawer').hidden=true;}
+$('gMenu').addEventListener('click',()=>{$('gMenuBox').hidden?openMenu('blocks'):closeMenu();});
+$('gMenuClose').addEventListener('click',closeMenu);
+$('gtBlocks').addEventListener('click',()=>menuTab('blocks'));
+$('gtSet').addEventListener('click',()=>menuTab('set'));
+$('gMat').addEventListener('click',()=>{$('gDrawer').hidden?openDrawer():closeDrawer();});
+$('gDrawerClose').addEventListener('click',closeDrawer);
+$('toGame').addEventListener('click',()=>setUI('game'));
+$('toNormal').addEventListener('click',()=>setUI('page'));
+// 写真を撮るときはメニューを閉じて画面を見せる
+$('photoBtn').addEventListener('click',()=>{closeMenu();closeDrawer();},true);
+document.addEventListener('keydown',e=>{
+ if(!isGame()||typing(e.target)||e.ctrlKey||e.metaKey||e.altKey)return;
+ const k=e.key.toLowerCase();
+ if(k==='e'){e.preventDefault();$('gMenuBox').hidden?openMenu('blocks'):closeMenu();}
+ else if(k==='m'){e.preventDefault();$('gDrawer').hidden?openDrawer():closeDrawer();}
+ else if(e.key==='Escape'){if(!$('gMenuBox').hidden)closeMenu();else if(!$('gDrawer').hidden)closeDrawer();}
+});
+// 最初に、どちらの画面で遊ぶかを選ぶ
+(function(){
+ let last='game';try{last=localStorage.getItem(UIKEY)||'game';}catch(e){}
+ const box=$('modeAsk');
+ box.querySelectorAll('.ma-opt').forEach(b=>{if(b.dataset.ui===last)b.classList.add('last');
+  b.addEventListener('click',()=>{box.hidden=true;setUI(b.dataset.ui);});});
+ box.hidden=false;const f=box.querySelector('.ma-opt.last');if(f)try{f.focus({preventScroll:true});}catch(e){}
+})();
+
 $('bcount').textContent=`${Object.keys(B).length}種類`;
 try{new ResizeObserver(resize).observe(cbox);}catch(e){window.addEventListener('resize',resize);}
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeBg);}catch(e){}
@@ -1456,24 +1781,30 @@ try{new MutationObserver(themeBg).observe(document.documentElement,{attributes:t
 renderHot();renderPal();themeBg();resize();updCam();changed();
 })();
 </script>
-
 <script>
 // ブログ（はてなブログなど）に iframe で埋め込んだときだけ動く：
-// ・ページの高さを親に知らせて、枠の高さを自動で合わせてもらう
+// ・ページの高さを親に知らせて、枠の高さを自動で合わせてもらう（ゲーム画面のときは、親の画面の高さに合わせる）
 // ・親の画面の高さを受け取って、3D画面の高さを決める（枠の中では vh が使えないため）
 // ・記事側のスクリプトが動かない場合は、枠の中でスクロールして使える
 (function(){
  if(window.parent===window)return;
- document.documentElement.classList.add('embedded');
- var last=0;
- function send(){var h=Math.ceil(document.documentElement.scrollHeight);if(h!==last){last=h;window.parent.postMessage({type:'mcnavi-height',h:h},'*');}}
- window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='mcnavi-vh'&&d.h>0){document.documentElement.style.setProperty('--pvh',Math.round(d.h)+'px');document.documentElement.classList.add('sized');setTimeout(send,50);}});
+ var root=document.documentElement;root.classList.add('embedded');
+ var last=0,pvh=0;
+ function send(){
+  var h=root.classList.contains('game')?Math.max(420,Math.round((pvh||760)*0.92)):Math.ceil(root.scrollHeight);
+  if(h!==last){last=h;window.parent.postMessage({type:'mcnavi-height',h:h},'*');}
+ }
+ window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='mcnavi-vh'&&d.h>0){pvh=d.h;root.style.setProperty('--pvh',Math.round(d.h)+'px');root.classList.add('sized');setTimeout(send,50);}});
  if(window.ResizeObserver)new ResizeObserver(send).observe(document.body);
+ new MutationObserver(function(){last=0;send();}).observe(root,{attributes:true,attributeFilter:['class']});
  window.addEventListener('load',send);setInterval(send,1500);send();
 })();
 </script>
 <style>
 html.embedded .canvasbox{height:clamp(380px,calc(var(--pvh,760px) * .78),980px)}
+html.embedded.game .canvasbox{height:100%}
+/* 枠の中は縦に長いので、最初の選択画面は枠の上のほうに出す */
+html.embedded .modeask{place-items:start center;padding-top:24px}
 /* 親ページの合図が届いたときだけ、枠の中のスクロールを止める（届かなければ枠の中でスクロールできる） */
 html.sized body{overflow:hidden}
 </style>
