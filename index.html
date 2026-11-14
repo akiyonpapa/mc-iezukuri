@@ -197,6 +197,18 @@ html.game #photoPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-
 .ma-opt.last{border-color:var(--accent)}
 .ma-opt:hover{border-color:var(--accent)}
 .uiswitch{align-self:flex-start}
+/* キャラ目線の移動ボタン（押している間だけ動く） */
+.fpad{position:absolute;left:10px;bottom:12px;z-index:3;display:grid;grid-template-columns:repeat(4,44px);grid-template-rows:repeat(2,44px);gap:6px}
+.fpad[hidden]{display:none}
+.fpk{font:inherit;font-size:16px;font-weight:700;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.82);color:#22301f;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
+.fpk.fpv{margin-left:8px;font-size:14px}
+.fpk:active,.fpk.on{background:#cfe9c1}
+html.game .fpad{bottom:calc(var(--hbh) + 92px + env(safe-area-inset-bottom,0px))}
+.tool[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cross{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;pointer-events:none;z-index:2}
+.cross::before,.cross::after{content:"";position:absolute;background:rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.cross::before{left:8px;top:0;width:2px;height:18px}.cross::after{top:8px;left:0;height:2px;width:18px}
+.cross[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -241,6 +253,7 @@ html.game #photoPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-
           </div>
           <div class="tools right" role="group" aria-label="視点">
             <button class="tool gonly" id="gMenu" aria-label="メニュー（ブロック選び・設定）" title="メニュー（ブロック選び・設定）（E）"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg></button>
+            <button class="tool" id="fpBtn" aria-pressed="false" aria-label="キャラ目線にする（F）" title="キャラ目線にする（F）"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="3"/><path d="M12 9v7M8 12h8M12 16l-3 5M12 16l3 5"/></svg></button>
             <button class="tool" id="zIn" aria-label="近づく" title="近づく"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5M10.5 7.5v6M7.5 10.5h6"/></svg></button>
             <button class="tool" id="zOut" aria-label="離れる" title="離れる"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5M7.5 10.5h6"/></svg></button>
             <button class="tool" id="tTop" aria-label="上から見る" title="上から見る"><svg viewBox="0 0 24 24"><path d="M12 2v7M9 6l3 3 3-3"/><rect x="5" y="12" width="14" height="9" rx="1"/></svg></button>
@@ -250,6 +263,15 @@ html.game #photoPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-
             <button class="tool" id="vReset" aria-label="視点を戻す" title="視点を戻す"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
           </div>
           <span class="facing" id="facing">見ている方向：北</span>
+          <span class="cross" id="cross" hidden></span>
+          <div class="fpad" id="fpad" hidden aria-label="キャラの移動">
+            <button class="fpk" data-mv="f" style="grid-area:1/2" aria-label="前へ">▲</button>
+            <button class="fpk" data-mv="l" style="grid-area:2/1" aria-label="左へ">◀</button>
+            <button class="fpk" data-mv="b" style="grid-area:2/2" aria-label="後ろへ">▼</button>
+            <button class="fpk" data-mv="r" style="grid-area:2/3" aria-label="右へ">▶</button>
+            <button class="fpk fpv" data-mv="u" style="grid-area:1/4" aria-label="上へ（飛ぶ）">上</button>
+            <button class="fpk fpv" data-mv="d" style="grid-area:2/4" aria-label="下へ（降りる）">下</button>
+          </div>
         </div>
         <div class="selpanel" id="selPanel" aria-live="polite" hidden></div>
         <div class="photo" id="photoPanel" hidden>
@@ -287,6 +309,7 @@ html.game #photoPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-
           <dt>置き換え</dt><dd>『置き換え』で置いてあるブロックをなぞると、ホットバーで選んだブロックに変わります。階段から階段のように同じ形なら、向きもそのままです</dd>
           <dt>範囲</dt><dd>『範囲』で角を2か所タップ → コピーか切り取り → 貼りたい場所をタップ → 回す・反転して『ここに貼る』。切り取りから貼ると移動になります</dd>
           <dt>天井</dt><dd>天井のアイコンを押すか、水平より下まで傾けると下から見上げます。床は自動で隠れるので、天井の裏にランタンを吊るすこともできます。隠す高さは▲▼で変えられます</dd>
+          <dt>キャラ目線</dt><dd>右の人のボタン（PCはFキー）で、マイクラと同じ目の高さから見られます。向いている方向に合わせて階段やドアの向きが決まるので、見上げながらでも向きを合わせやすくなります。移動は左下のボタン（PCはWASD・矢印キー、スペースで上、Cで下）、見回すのは2本指（PCは右ドラッグ）です。もう一度押すと元の視点に戻ります</dd>
           <dt>並び方</dt><dd>最初に触った面と同じ平面に並びます。地面なら床や列、壁の横なら壁が広がります。傾きは『上から』『横から』で変えられます</dd>
           <dt>向き</dt><dd>階段・かまど・ドア・ベッドなどの向きは、いま見ている方向で決まります。ドア・トラップドア・フェンスゲートは『置く』のままタップすると開け閉めできます</dd>
         </dl>
@@ -976,7 +999,9 @@ function geom(d,c,x,y,z,get){
   const arm={north:[7,0,9,6],south:[7,10,9,16],west:[0,7,6,9],east:[10,7,16,9]};
   for(const k of HD)if(connects(d,k,x,y,z,get)){const a=arm[k];boxes.push(bx([a[0],12,a[1]],[a[2],15,a[3]],f),bx([a[0],6,a[1]],[a[2],9,a[3]],f));}
   return{boxes};}
- case'door':{const R=c.hinge==='right',f=fmap(c.p==='upper'?(R?tx.topM:tx.top):(R?tx.bottomM:tx.bottom));
+ case'door':{const R=c.hinge==='right',U=c.p==='upper',f=fmap(U?(R?tx.topM:tx.top):(R?tx.bottomM:tx.bottom));
+  // 裏側は左右反対の絵にする（マイクラと同じく、取っ手が表から見ても裏から見ても蝶番の反対側に来る）
+  f[c.open?(R?'east':'west'):'north']=FT(U?(R?tx.top:tx.topM):(R?tx.bottom:tx.bottomM));
   // 蝶番が左なら左側へ、右なら右側へ開く（見る人から見た左右）
   const b=c.open?(R?bx([13,0,0],[16,16,16],f):bx([0,0,0],[3,16,16],f)):bx([0,0,13],[16,16,16],f);return{boxes:[rotY(b,c.f||0)]};}
  case'gate':{const f=fmap(tx),b=[bx([0,5,7],[2,16,9],f),bx([14,5,7],[16,16,9],f)];
@@ -1215,8 +1240,13 @@ function fwd(){return[-Math.sin(cam.yaw)*Math.cos(cam.pitch),-Math.sin(cam.pitch
 function playerFacing(){const f=fwd();return Math.abs(f[0])>Math.abs(f[2])?(f[0]>0?1:3):(f[2]>0?2:0);}
 function look6(){const f=fwd(),ax=Math.abs(f[0]),ay=Math.abs(f[1]),az=Math.abs(f[2]);if(ay>ax&&ay>az)return f[1]>0?'up':'down';return HD[playerFacing()];}
 const JDIR=['北','東','南','西'];
+// キャラ目線：fp に目の位置（ブロック単位）を持つ。向きは cam.yaw / cam.pitch をそのまま使う
+let fp=null;
 function updCam(){
  if(!renderer)return;
+ if(fp){cam.pitch=Math.max(-1.5,Math.min(1.5,cam.pitch));fp.x=Math.max(LIM.x0-1,Math.min(LIM.x1+2,fp.x));fp.z=Math.max(LIM.z0-1,Math.min(LIM.z1+2,fp.z));fp.y=Math.max(LIM.y0+.6,Math.min(48,fp.y));
+  const f=fwd();camera.position.set(fp.x,fp.y,fp.z);camera.lookAt(fp.x+f[0],fp.y+f[1],fp.z+f[2]);
+  $('facing').textContent='キャラ目線：'+JDIR[playerFacing()]+'を向いている';if(lookUp){lookUp=false;$('lowBox').hidden=true;rebuild();}req();return;}
  // 下から見上げられるように、水平より下（マイナス）まで傾けられる
  cam.pitch=Math.max(-1.45,Math.min(1.52,cam.pitch));cam.dist=Math.max(4,Math.min(80,cam.dist));
  cam.tx=Math.max(LIM.x0-2,Math.min(LIM.x1+3,cam.tx));cam.tz=Math.max(LIM.z0-2,Math.min(LIM.z1+3,cam.tz));cam.ty=Math.max(0,Math.min(30,cam.ty));
@@ -1513,7 +1543,7 @@ if(renderer){
   if(e.pointerType==='mouse'){
    if(ptrs.size>1)return;
    // スペース＋左ドラッグ：移動／Alt＋左クリック：ブロックを手に取る／Shift＋左ドラッグ：壊す
-   if(e.button===0&&spaceDown){gest={kind:'pan'};}
+   if(e.button===0&&spaceDown&&!fp){gest={kind:'pan'};}
    else if(e.button===0&&e.altKey){e.preventDefault();altUsed=true;pickBlock(e.clientX,e.clientY);gest={kind:'none'};}
    else if(e.button===0&&e.shiftKey&&mode!=='break'){tempMode=mode;mode='break';gest={kind:'stroke'};beginStroke(e.clientX,e.clientY);}
    else if(e.button===0){gest={kind:'stroke'};beginStroke(e.clientX,e.clientY);}
@@ -1531,14 +1561,15 @@ if(renderer){
   if(gest.kind==='pending'&&Math.hypot(e.clientX-gest.sx,e.clientY-gest.sy)>6){clearTimeout(pendT);gest.kind='stroke';beginStroke(gest.sx,gest.sy);}
   if(gest.kind==='stroke')strokeMove(e.clientX,e.clientY);
   else if(gest.kind==='orbit')orbit(dx,dy);
-  else if(gest.kind==='pan')pan(dx,dy);
+  else if(gest.kind==='pan'){if(fp)orbit(dx,dy);else pan(dx,dy);}
   else if(gest.kind==='two'&&ptrs.size===2){const s=twoState();
    // 動き始めの向きで決める：2本そろって縦に動いたら傾き、それ以外は移動・回転・拡大
    if(!gest.sub){const cur=[...ptrs.values()],m=cur.map((q,i)=>({dx:q.x-gest.start[i].x,dy:q.y-gest.start[i].y}));
     const hs=m.map(v=>Math.hypot(v.dx,v.dy));if(Math.max(...hs)<10||(Math.min(...hs)<6&&Math.max(...hs)<28))return;
     const vert=m.every(v=>Math.abs(v.dy)>Math.abs(v.dx)*1.4)&&Math.sign(m[0].dy)===Math.sign(m[1].dy)&&Math.abs(s.d-two.d)<two.d*.15;
     gest.sub=vert?'tilt':'map';two=s;return;}
-   if(gest.sub==='tilt'){cam.pitch+=(s.my-two.my)*.007;updCam();}
+   if(fp){cam.yaw-=(s.mx-two.mx)*.006;cam.pitch+=(s.my-two.my)*.006;const k=(s.d-two.d)*.03,h=[-Math.sin(cam.yaw),-Math.cos(cam.yaw)];fp.x+=h[0]*k;fp.z+=h[1]*k;updCam();}
+   else if(gest.sub==='tilt'){cam.pitch+=(s.my-two.my)*.007;updCam();}
    else if(two){cam.dist*=two.d/Math.max(s.d,1);let da=s.ang-two.ang;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;cam.yaw+=da;pan(s.mx-two.mx,s.my-two.my);}
    two=s;}
  });
@@ -1549,7 +1580,7 @@ if(renderer){
   if(e.pointerType==='mouse'&&!ptrs.size)showHL(pick(e.clientX,e.clientY));};
  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
  cv.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&!ptrs.size)showHL(null);});
- cv.addEventListener('wheel',e=>{e.preventDefault();cam.dist*=Math.exp(e.deltaY*.0012);updCam();},{passive:false});
+ cv.addEventListener('wheel',e=>{e.preventDefault();if(fp){const k=-e.deltaY*.006,h=[-Math.sin(cam.yaw),-Math.cos(cam.yaw)];fp.x+=h[0]*k;fp.z+=h[1]*k;updCam();return;}cam.dist*=Math.exp(e.deltaY*.0012);updCam();},{passive:false});
  cv.addEventListener('contextmenu',e=>e.preventDefault());
 }
 
@@ -1630,14 +1661,14 @@ document.addEventListener('click',e=>{
  else if(t.id==='pEnd'){paste=null;sel={a:null,b:null};drawSel();renderSel();}
  else if(t.id==='mPlace'){mode='place';setMode();}
  else if(t.id==='mBreak'){mode='break';setMode();}
- else if(t.id==='zIn'){cam.dist*=.8;updCam();}
+ else if(t.id==='zIn'){if(fp){fp.x-=Math.sin(cam.yaw);fp.z-=Math.cos(cam.yaw);}else cam.dist*=.8;updCam();}
  else if(t.id==='tTop'){cam.pitch+=.25;updCam();}
- else if(t.id==='tUp'){cam.pitch=-.55;updCam();}
+ else if(t.id==='tUp'){cam.pitch=fp?-.9:-.55;updCam();}
  else if(t.id==='lowDn'){setLow(lowY-1);}
  else if(t.id==='lowUp'){setLow(lowY+1);}
  else if(t.id==='tSide'){cam.pitch-=.25;updCam();}
- else if(t.id==='zOut'){cam.dist*=1.25;updCam();}
- else if(t.id==='vReset'){Object.assign(cam,camDefault);updCam();}
+ else if(t.id==='zOut'){if(fp){fp.x+=Math.sin(cam.yaw);fp.z+=Math.cos(cam.yaw);}else cam.dist*=1.25;updCam();}
+ else if(t.id==='vReset'){if(fp)setFP(false);Object.assign(cam,camDefault);updCam();}
  else if(t.id==='toPal'){if(document.documentElement.classList.contains('game')){openMenu('blocks');return;}$('palPanel').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}
  else if(t.id==='clearAsk'){confirmClear=true;renderMats();}
  else if(t.id==='clearNo'){confirmClear=false;renderMats();}
@@ -1716,6 +1747,43 @@ document.addEventListener('keydown',e=>{if(e.code==='Space'&&!typing(e.target)&&
 document.addEventListener('keyup',e=>{if(e.code==='Space'){spaceDown=false;cv.style.cursor='';}if(e.key==='Alt'&&altUsed){e.preventDefault();altUsed=false;}});
 window.addEventListener('blur',()=>{spaceDown=false;cv.style.cursor='';});
 cv.addEventListener('pointerenter',()=>{overCanvas=true;});cv.addEventListener('pointerleave',()=>{overCanvas=false;});
+
+// ===================== キャラ目線（マイクラと同じ目の高さで見て、向いた方向でブロックを置く） =====================
+const EYE=1.62;
+function setFP(on){
+ if(on&&!fp){const h=[-Math.sin(cam.yaw),-Math.cos(cam.yaw)];fp={x:cam.tx-h[0]*7,y:Math.max(0,cam.ty)+EYE,z:cam.tz-h[1]*7};cam.pitch=.12;
+  // ブロックの中に立たないように、空いている所まで少しずつ下がる
+  for(let i=0;i<30;i++){const fx=Math.floor(fp.x),fz=Math.floor(fp.z),fy=Math.floor(fp.y-EYE);if(!world.get(K(fx,fy,fz))&&!world.get(K(fx,fy+1,fz)))break;fp.x-=h[0]*.5;fp.z-=h[1]*.5;}}
+ else if(!on&&fp){const h=[-Math.sin(cam.yaw),-Math.cos(cam.yaw)];cam.tx=fp.x+h[0]*5;cam.tz=fp.z+h[1]*5;cam.ty=Math.max(0,Math.round(fp.y-EYE));cam.dist=16;cam.pitch=.55;fp=null;}
+ $('fpBtn').setAttribute('aria-pressed',!!fp);$('fpBtn').setAttribute('aria-label',fp?'キャラ目線をやめる（F）':'キャラ目線にする（F）');$('fpBtn').title=$('fpBtn').getAttribute('aria-label');
+ $('fpad').hidden=!fp;$('cross').hidden=!fp;
+ if(fp)status('キャラ目線にしました。向いている方向でブロックの向きが決まります','info');
+ updCam();
+}
+// 押している間だけ動く。前後左右は今向いている方向が基準
+const fpHeld=new Set();let fpRaf=0,fpLast=0;
+function fpStep(ts){
+ fpRaf=0;if(!fp||!fpHeld.size){fpLast=0;return;}
+ const dt=fpLast?Math.min(.05,(ts-fpLast)/1000):0;fpLast=ts;const sp=5*dt,h=[-Math.sin(cam.yaw),-Math.cos(cam.yaw)];
+ if(fpHeld.has('f')){fp.x+=h[0]*sp;fp.z+=h[1]*sp;}if(fpHeld.has('b')){fp.x-=h[0]*sp;fp.z-=h[1]*sp;}
+ if(fpHeld.has('r')){fp.x-=h[1]*sp;fp.z+=h[0]*sp;}if(fpHeld.has('l')){fp.x+=h[1]*sp;fp.z-=h[0]*sp;}
+ if(fpHeld.has('u'))fp.y+=sp;if(fpHeld.has('d'))fp.y-=sp;
+ updCam();fpRaf=requestAnimationFrame(fpStep);
+}
+function fpHold(k,on){if(on)fpHeld.add(k);else fpHeld.delete(k);document.querySelectorAll(`.fpk[data-mv="${k}"]`).forEach(b=>b.classList.toggle('on',on));if(fpHeld.size&&!fpRaf){fpLast=0;fpRaf=requestAnimationFrame(fpStep);}}
+document.querySelectorAll('.fpk').forEach(b=>{const k=b.dataset.mv;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId);}catch(_){}if(fp){const h=[-Math.sin(cam.yaw),-Math.cos(cam.yaw)],n=.3,m={f:[h[0],0,h[1]],b:[-h[0],0,-h[1]],r:[-h[1],0,h[0]],l:[h[1],0,-h[0]],u:[0,1,0],d:[0,-1,0]}[k];fp.x+=m[0]*n;fp.y+=m[1]*n;fp.z+=m[2]*n;updCam();}fpHold(k,true);});
+ for(const ev of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>fpHold(k,false));
+ b.addEventListener('contextmenu',e=>e.preventDefault());});
+$('fpBtn').addEventListener('click',()=>setFP(!fp));
+const FPKEY={KeyW:'f',ArrowUp:'f',KeyS:'b',ArrowDown:'b',KeyA:'l',ArrowLeft:'l',KeyD:'r',ArrowRight:'r',Space:'u',KeyC:'d'};
+document.addEventListener('keydown',e=>{
+ if(typing(e.target)||e.ctrlKey||e.metaKey||e.altKey)return;
+ if(e.code==='KeyF'&&!e.repeat){e.preventDefault();setFP(!fp);return;}
+ if(fp&&FPKEY[e.code]){e.preventDefault();e.stopImmediatePropagation();fpHold(FPKEY[e.code],true);}
+},true);
+document.addEventListener('keyup',e=>{if(FPKEY[e.code])fpHold(FPKEY[e.code],false);});
+window.addEventListener('blur',()=>{for(const k of[...fpHeld])fpHold(k,false);});
 // Alt＋クリック：クリックしたブロックをホットバーに入れる（マイクラのブロック選択と同じ）
 function pickBlock(cx,cy){
  const h=pick(cx,cy);if(!h)return;const c=get(h.x,h.y,h.z);if(!c)return;const id=c.id;
